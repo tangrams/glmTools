@@ -6,7 +6,7 @@
 //
 //
 
-#include "glmLables.h"
+#include "glmLabel.h"
 
 using namespace glm;
 
