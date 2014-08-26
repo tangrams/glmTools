@@ -21,7 +21,7 @@ void glmPolyline::clear(){
     distances.clear();
 }
 
-void glmPolyline::add( const glm::vec3 & _point ){
+void glmPolyline::add( const vec3 & _point ){
     if(size()>0){
         polars.push_back( glmPolarPoint(cartesians[cartesians.size()-1],_point) );
         distances.push_back( distances[distances.size()-1] + polars[polars.size()-1].r );
@@ -31,13 +31,27 @@ void glmPolyline::add( const glm::vec3 & _point ){
     cartesians.push_back(_point);
 }
 
-void glmPolyline::add(const std::vector<glm::vec3> & _points){
+void glmPolyline::add(const vector<vec3> & _points){
     for (int i = 0; i < _points.size(); i++) {
         add(_points[i]);
     }
 }
 
-glm::vec3& glmPolyline::operator [](const int &_index){
+void glmPolyline::addVertices(const vector<vec3>& verts) {
+
+    for (int i = 0 ; i < verts.size() ; i++) {
+        add(verts[i]);
+    }
+}
+
+//----------------------------------------------------------
+void glmPolyline::addVertices(const vec3* verts, int numverts) {
+    for (int i = 0 ; i < numverts ; i++) {
+        add(verts[i]);
+    }
+}
+
+vec3& glmPolyline::operator [](const int &_index){
     return cartesians[_index];
 }
 
@@ -58,13 +72,13 @@ double glmPolyline::getAngleAt(const double &_dist) const{
     return 0;
 }
 
-glm::vec3 glmPolyline::getPositionAt(const double &_dist) const{
+vec3 glmPolyline::getPositionAt(const double &_dist) const{
     
     //  Todo fix this
     //
     
     if (size()==2) {
-        return glm::vec3(_dist*cos(polars[0].a),
+        return vec3(_dist*cos(polars[0].a),
                          _dist*sin(polars[0].a),
                          0.0f);
     }
@@ -72,7 +86,7 @@ glm::vec3 glmPolyline::getPositionAt(const double &_dist) const{
     for (int i = 1; i < distances.size(); i++) {
         if(_dist<=distances[i]){
             double diff = _dist-distances[i];
-            return glm::vec3(cartesians[i].x + diff*cos(polars[i-1].a),
+            return vec3(cartesians[i].x + diff*cos(polars[i-1].a),
                              cartesians[i].y + diff*sin(polars[i-1].a),
                              0.0f);
         }
@@ -113,7 +127,7 @@ typedef struct{
 #define d(u,v)     norm(u-v)       // distance = norm of difference
 
 //--------------------------------------------------
-static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
+static void simplifyDP(float tol, vec3* v, int j, int k, int* mk ){
     if (k <= j+1) // there is nothing to simplify
         return;
     
@@ -236,6 +250,10 @@ double glmPolyline::getLength(const int &_index) const {
     }
 }
 
+vector<vec3> & glmPolyline::getVertices(){
+	return cartesians;
+}
+
 void glmPolyline::draw(){
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {
@@ -258,7 +276,7 @@ void glmPolyline::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
         double angle = polars[i].a-HALF_PI;
         
-        glm::vec3 head;
+        vec3 head;
         head.x = polars[i].r * cos(angle);
         head.y = polars[i].r * sin(angle);
         head.z = 0.0f;

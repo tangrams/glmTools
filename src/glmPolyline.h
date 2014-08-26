@@ -14,7 +14,7 @@ using namespace std;
 using namespace glm;
 
 struct glmPolarPoint {
-    glmPolarPoint(const glm::vec3 &_org, const glm::vec3 &_dst){
+    glmPolarPoint(const vec3 &_org, const vec3 &_dst){
         
         //  TODO: pass this to 3D
         //
@@ -30,8 +30,10 @@ struct glmPolarPoint {
 class glmPolyline {
 public:
     
-    void    add(const glm::vec3 &_point);
-    void    add(const std::vector<glm::vec3> & _points);
+    void    add(const vec3 &_point);
+    void    add(const vector<vec3> & _points);
+    void    addVertices( const vector<vec3>& verts );
+	void    addVertices(const vec3* verts, int numverts);
     
     vec3&   operator [](const int &_index);
     double  getLength(const int &_index = -1) const;
@@ -39,6 +41,7 @@ public:
     vec3    getPositionAt(const double &_dist) const;
     double  getAngleAt(const double &_dist) const;
     
+    vector<vec3> & getVertices();
     double  getFractAt(double _dist,double _offset=1.)const;
     glmMesh getMesh(double _width = 3.0);
     

@@ -15,6 +15,14 @@ void glmMesh::addVertex(const vec3 &_point){
     vertices.push_back(_point);
 }
 
+void glmMesh::addVertices(const vector<vec3>& _verts){
+    vertices.insert(vertices.end(),_verts.begin(),_verts.end());
+}
+
+void glmMesh::addVertices(const vec3* verts, int amt){
+    vertices.insert(vertices.end(),verts,verts+amt);
+}
+
 void glmMesh::addNormal(const vec3 &_normal){
     normals.push_back(_normal);
 }
@@ -25,6 +33,19 @@ void glmMesh::addColor(const vec4 &_color){
 
 void glmMesh::addIndex(uint16_t _i){
     indices.push_back(_i);
+}
+
+void glmMesh::addIndices(const vector<uint16_t>& inds){
+	indices.insert(indices.end(),inds.begin(),inds.end());
+}
+
+//--------------------------------------------------------------
+void glmMesh::addIndices(const uint16_t* inds, int amt){
+	indices.insert(indices.end(),inds,inds+amt);
+}
+
+vector<vec3> & glmMesh::getVertices(){
+	return vertices;
 }
 
 void glmMesh::clear(){
@@ -41,10 +62,6 @@ void glmMesh::clear(){
 		indices.clear();
 	}
 
-}
-
-int glmMesh::getNumVertex(){
-    return vertices.size();
 }
 
 void glmMesh::draw(GLenum _drawMode){
