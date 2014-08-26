@@ -45,11 +45,11 @@ void drawText(FTFont *font, const glmText & _text, const glmPolyline &_polyline,
 //            width += 1.;
 //        }
         
-        vec2 src = _polyline.getPositionAt(width);
+        vec3 src = _polyline.getPositionAt(width);
         double rot = _polyline.getAngleAt(width);
         
         glPushMatrix();
-        glTranslated(src.x, src.y, 0.);
+        glTranslated(src.x, src.y, src.z);
         glScalef(1,-1,1);
         glRotated(rot*RAD_TO_DEG, 0, 0, -1);
         font->Render( &_text.content[i] , 1);

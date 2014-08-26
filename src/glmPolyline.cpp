@@ -21,9 +21,9 @@ void glmPolyline::clear(){
     distances.clear();
 }
 
-void glmPolyline::add( const glm::vec2 & _point ){
+void glmPolyline::add( const glm::vec3 & _point ){
     if(size()>0){
-        polars.push_back(glmPolarPoint(cartesians[cartesians.size()-1],_point));
+        polars.push_back( glmPolarPoint(cartesians[cartesians.size()-1],_point) );
         distances.push_back( distances[distances.size()-1] + polars[polars.size()-1].r );
     } else {
         distances.push_back(0.0);
@@ -31,13 +31,13 @@ void glmPolyline::add( const glm::vec2 & _point ){
     cartesians.push_back(_point);
 }
 
-void glmPolyline::add(const std::vector<glm::vec2> & _points){
+void glmPolyline::add(const std::vector<glm::vec3> & _points){
     for (int i = 0; i < _points.size(); i++) {
         add(_points[i]);
     }
 }
 
-glm::vec2& glmPolyline::operator [](const int &_index){
+glm::vec3& glmPolyline::operator [](const int &_index){
     return cartesians[_index];
 }
 
@@ -58,18 +58,23 @@ double glmPolyline::getAngleAt(const double &_dist) const{
     return 0;
 }
 
-glm::vec2 glmPolyline::getPositionAt(const double &_dist) const{
+glm::vec3 glmPolyline::getPositionAt(const double &_dist) const{
+    
+    //  Todo fix this
+    //
     
     if (size()==2) {
-        return glm::vec2(_dist*cos(polars[0].a),
-                         _dist*sin(polars[0].a));
+        return glm::vec3(_dist*cos(polars[0].a),
+                         _dist*sin(polars[0].a),
+                         0.0f);
     }
     
     for (int i = 1; i < distances.size(); i++) {
         if(_dist<=distances[i]){
             double diff = _dist-distances[i];
-            return glm::vec2(cartesians[i].x + diff*cos(polars[i-1].a),
-                             cartesians[i].y + diff*sin(polars[i-1].a));
+            return glm::vec3(cartesians[i].x + diff*cos(polars[i-1].a),
+                             cartesians[i].y + diff*sin(polars[i-1].a),
+                             0.0f);
         }
     }
     
@@ -99,7 +104,7 @@ double glmPolyline::getFractAt(double _dist,double _offset)const{
 // Users of this code must verify correctness for their application.
 
 typedef struct{
-    vec2 P0, P1;
+    vec3 P0, P1;
 } Segment;
 
 #define norm2(v)   dot(v,v)        // norm2 = squared length of vector
@@ -108,7 +113,7 @@ typedef struct{
 #define d(u,v)     norm(u-v)       // distance = norm of difference
 
 //--------------------------------------------------
-static void simplifyDP(float tol, glm::vec2* v, int j, int k, int* mk ){
+static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
     if (k <= j+1) // there is nothing to simplify
         return;
     
@@ -117,15 +122,15 @@ static void simplifyDP(float tol, glm::vec2* v, int j, int k, int* mk ){
     float   maxd2	= 0;         // distance squared of farthest vertex
     float   tol2	= tol * tol;  // tolerance squared
     Segment S		= {v[j], v[k]};  // segment from v[j] to v[k]
-    vec2 u;
+    vec3 u;
 	u				= S.P1 - S.P0;   // segment direction vector
     double  cu		= dot(u,u);     // segment length squared
     
     // test each vertex v[i] for max distance from S
     // compute using the Feb 2001 Algorithm's dist_ofPoint_to_Segment()
     // Note: this works in any dimension (2D, 3D, ...)
-    glm::vec2  w;
-    glm::vec2   Pb;                // base of perpendicular from v[i] to S
+    vec3  w;
+    vec3   Pb;                // base of perpendicular from v[i] to S
     float  b, cw, dv2;        // dv2 = distance v[i] to S squared
     
     for (int i=j+1; i<k; i++){
@@ -167,12 +172,12 @@ void glmPolyline::simplify(double tol){
 		return;
 	}
     
-    vector<vec2> sV;
+    vector<vec3> sV;
 	sV.resize(n);
     
     int    i, k, m, pv;            // misc counters
     float  tol2 = tol * tol;       // tolerance squared
-    vector<vec2> vt;
+    vector<vec3> vt;
     vector<int> mk;
     vt.resize(n);
 	mk.resize(n,0);
@@ -253,9 +258,10 @@ void glmPolyline::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
         double angle = polars[i].a-HALF_PI;
         
-        glm::vec2 head;
+        glm::vec3 head;
         head.x = polars[i].r * cos(angle);
         head.y = polars[i].r * sin(angle);
+        head.z = 0.0f;
         drawLine(cartesians[i],cartesians[i]+head);
     }
 }
@@ -263,80 +269,62 @@ void glmPolyline::drawNormals(){
 //  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
 //  https://www.mapbox.com/blog/drawing-antialiased-lines/
 //
-glmMesh glmPolyline::getMesh(double _width){
-    glmMesh mesh;
-    
+void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
     //  From Matt code
     //
-    float xim1, yim1, zim1; // Previous point coordinates
-    float xi, yi, zi;       // Current point coordinates
-    float xip1, yip1, zip1; // Next point coordinates
-    
     vec3 normi;             // Right normal to segment between previous and current points
     vec3 normip1;           // Right normal to segment between current and next points
     vec3 rightNorm;         // Right "normal" at current point, scaled for miter joint
     
-    xi = cartesians[0].x;
-    yi = cartesians[0].y;
-    zi = 0.;
+    vec3 im1;                   // Previous point coordinates
+    vec3 i0 = cartesians[0];    // Current point coordinates
+    vec3 ip1 = cartesians[1];   // Next point coordinates
     
-    xip1 = cartesians[1].x;
-    yip1 = cartesians[1].y;
-    zip1 = 0.;
-    
-    normip1.x = yip1 - yi;
-    normip1.y = xi - xip1;
+    normip1.x = ip1.y - i0.y;
+    normip1.y = i0.x - ip1.x;
     normip1.z = 0.;
+    
     normip1 = normalize(normip1);
     
     rightNorm = vec3(normip1.x*_width,normip1.y*_width,normip1.z*_width);
     
-    vec3 startRight = vec3(xi + rightNorm.x, yi + rightNorm.y, 0.);
-    vec3 startLeft = vec3(xi - rightNorm.x, yi - rightNorm.y, 0.);
-    
-    mesh.addVertex(startRight);
-    mesh.addVertex(startLeft);
+    _mesh.addVertex(i0 + rightNorm);
+    _mesh.addVertex(i0 - rightNorm);
     
     // Loop over intermediate points in the polyline
     //
     for (int i = 1; i < size() - 1; i++) {
         
-        xim1 = xi;
-        yim1 = yi;
-        zim1 = zi;
+        im1 = i0;
+        i0 = ip1;
         
-        xi = xip1;
-        yi = yip1;
-        zi = zip1;
-        
-        xip1 = cartesians[i+1].x;
-        yip1 = cartesians[i+1].y;
-        zip1 = 0.;
+        ip1 = cartesians[i+1];
         
         normi = normip1;
         
-        normip1.x = yip1 - yi;
-        normip1.y = xi - xip1;
+        normip1.x = ip1.y - i0.y;
+        normip1.y = i0.x - ip1.x;
         normip1.z = 0.0f;
         normip1 = normalize(normip1);
-
+        
         rightNorm = normi + normip1;
         float scale = sqrtf(2. / (1. + dot(normi,normip1) )) * _width / 2.;
         rightNorm *= scale;
         
-        vec3 vertRight = vec3(xi + rightNorm.x, yi + rightNorm.y, 0.0f);
-        vec3 vertLeft = vec3(xi - rightNorm.x, yi - rightNorm.y, 0.0f);
-        
-        mesh.addVertex(vertRight);
-        mesh.addVertex(vertLeft);
+        _mesh.addVertex(i0+rightNorm);
+        _mesh.addVertex(i0-rightNorm);
         
     }
     
-    // Last segment creates a square "end" to the polyline
-    vec3 endRight = vec3(xip1 + normip1.x*_width, yip1 + normip1.y*_width , 0.0f);
-    vec3 endLeft = vec3(xip1 - normip1.x*_width, yip1 - normip1.y*_width, 0.0f);
-    mesh.addVertex(endRight);
-    mesh.addVertex(endLeft);
+    normip1 *= _width;
+    _mesh.addVertex(ip1 + normip1);
+    _mesh.addVertex(ip1 - normip1);
+}
+
+glmMesh glmPolyline::getMesh(double _width){
+    glmMesh mesh;
+    
+    addToMesh(mesh,_width);
     
     return mesh;
 }

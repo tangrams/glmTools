@@ -15,6 +15,9 @@
 
 #include "glm/glm.hpp"
 
+using namespace glm;
+using namespace std;
+
 #ifndef PI
 #define PI       3.14159265358979323846
 #endif
@@ -33,6 +36,10 @@
 
 #ifndef HALF_PI
 #define HALF_PI  1.57079632679489661923
+#endif
+
+#ifndef R_EARTH
+#define R_EARTH 6378137
 #endif
 
 #ifndef DEG_TO_RAD

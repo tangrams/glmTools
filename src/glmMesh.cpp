@@ -23,7 +23,7 @@ void glmMesh::addColor(const vec4 &_color){
     colors.push_back(_color);
 }
 
-void glmMesh::addIndex(TESSindex _i){
+void glmMesh::addIndex(uint16_t _i){
     indices.push_back(_i);
 }
 

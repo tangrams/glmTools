@@ -9,20 +9,33 @@
 
 #include "glmTools.h"
 
-void drawLine(const glm::vec2 &_a, const glm::vec2 &_b){
-    glm::vec2 linePoints[2];
+float y2lat(float y) { return RAD_TO_DEG*(2. * atan(exp(DEG_TO_RAD*y)) - PI / 2); }
+float x2lon(float x) { return RAD_TO_DEG*(x / R_EARTH); }
+float lat2y(float lat) { return R_EARTH * log(tan(PI / 4 + (DEG_TO_RAD*lat) / 2)); }
+float lon2x(float lon) { return (DEG_TO_RAD*lon) * R_EARTH; }
+
+vec3 getCentroid(vector<vec3> &_pts){
+    vec3 centroid;
+    for (int i = 0; i < _pts.size(); i++) {
+        centroid += _pts[i] / (float)_pts.size();
+    }
+    return centroid;
+}
+
+void drawLine(const vec3 &_a, const vec3 &_b){
+    vec3 linePoints[2];
     linePoints[0] = _a;
     linePoints[1] = _b;
     
     glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec2), &linePoints[0].x);
+	glVertexPointer(2, GL_FLOAT, sizeof(vec3), &linePoints[0].x);
 	glDrawArrays(GL_LINES, 0, 2);
 };
 
-bool lineSegmentIntersection(const glm::vec2 &_line1Start, const glm::vec2 &_line1End,
-                             const glm::vec2 &_line2Start, const glm::vec2 &_line2End,
-                             glm::vec2 &_intersection ){
-	glm::vec2 diffLA, diffLB;
+bool lineSegmentIntersection(const vec3 &_line1Start, const vec3 &_line1End,
+                             const vec3 &_line2Start, const vec3 &_line2End,
+                             vec3 &_intersection ){
+	vec3 diffLA, diffLB;
 	double compareA, compareB;
 	diffLA = _line1End - _line1Start;
 	diffLB = _line2End - _line2Start;

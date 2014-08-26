@@ -14,10 +14,15 @@ using namespace std;
 using namespace glm;
 
 struct glmPolarPoint {
-    glmPolarPoint(const glm::vec2 &_org, const glm::vec2 &_dst){
-        vec2 diff = _dst - _org;
+    glmPolarPoint(const glm::vec3 &_org, const glm::vec3 &_dst){
+        
+        //  TODO: pass this to 3D
+        //
+        
+        vec3 diff = _dst - _org;
         a = atan2(diff.y,diff.x);
-        r = length(diff);
+        r = length(vec2(diff.x,diff.y));
+
     };
     double a,r;
 };
@@ -25,17 +30,19 @@ struct glmPolarPoint {
 class glmPolyline {
 public:
     
-    void    add(const glm::vec2 &_point);
-    void    add(const std::vector<glm::vec2> & _points);
+    void    add(const glm::vec3 &_point);
+    void    add(const std::vector<glm::vec3> & _points);
     
-    vec2&   operator [](const int &_index);
+    vec3&   operator [](const int &_index);
     double  getLength(const int &_index = -1) const;
     
-    vec2    getPositionAt(const double &_dist) const;
+    vec3    getPositionAt(const double &_dist) const;
     double  getAngleAt(const double &_dist) const;
     
     double  getFractAt(double _dist,double _offset=1.)const;
-    glmMesh getMesh(double _width);
+    glmMesh getMesh(double _width = 3.0);
+    
+    void    addToMesh(glmMesh &_mesh, double _width = 3.0);
     
     int     size() const;
 
@@ -47,7 +54,7 @@ public:
     void    drawNormals();
 
 protected:
-    vector<vec2>    cartesians;
+    vector<vec3>    cartesians;
     
     //  Cached data
     //
