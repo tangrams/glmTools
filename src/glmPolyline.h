@@ -9,9 +9,7 @@
 
 #include "glmTools.h"
 #include "glmMesh.h"
-
-using namespace std;
-using namespace glm;
+#include "glmRectangle.h"
 
 struct glmPolarPoint {
     glmPolarPoint(const vec3 &_org, const vec3 &_dst){
@@ -44,6 +42,8 @@ public:
     vector<vec3> & getVertices();
     double  getFractAt(double _dist,double _offset=1.)const;
     glmMesh getMesh(double _width = 3.0);
+	glmRectangle getBoundingBox() const;
+    void    growToInclude(glmRectangle &_bbox) const;
     
     void    addToMesh(glmMesh &_mesh, double _width = 3.0);
     

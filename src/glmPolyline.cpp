@@ -8,7 +8,6 @@
 #include "glmPolyline.h"
 
 #include <OpenGL/gl.h>
-#include "glmHelpers.h"
 
 int glmPolyline::size() const {
     return cartesians.size();
@@ -288,6 +287,7 @@ void glmPolyline::drawNormals(){
 //  https://www.mapbox.com/blog/drawing-antialiased-lines/
 //
 void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
+
     //  From Matt code
     //
     vec3 normi;             // Right normal to segment between previous and current points
@@ -307,7 +307,12 @@ void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
     rightNorm = vec3(normip1.x*_width,normip1.y*_width,normip1.z*_width);
     
     _mesh.addVertex(i0 + rightNorm);
+    _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+    _mesh.addTexCoord(vec2(1.0,0.0));
+    
     _mesh.addVertex(i0 - rightNorm);
+    _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+    _mesh.addTexCoord(vec2(0.0,0.0));
     
     // Loop over intermediate points in the polyline
     //
@@ -330,19 +335,46 @@ void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
         rightNorm *= scale;
         
         _mesh.addVertex(i0+rightNorm);
+        _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+        _mesh.addTexCoord(vec2(1.0,(float)i/(float)size()));
+        
         _mesh.addVertex(i0-rightNorm);
+        _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+        _mesh.addTexCoord(vec2(0.0,(float)i/(float)size()));
         
     }
     
     normip1 *= _width;
+    
     _mesh.addVertex(ip1 + normip1);
+    _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+    _mesh.addTexCoord(vec2(1.0,1.0));
+    
     _mesh.addVertex(ip1 - normip1);
+    _mesh.addNormal(vec3(0.0f, 0.0f, 1.0f));
+    _mesh.addTexCoord(vec2(0.0,1.0));
+    
+    _mesh.setDrawMode(GL_TRIANGLE_STRIP);
 }
 
 glmMesh glmPolyline::getMesh(double _width){
     glmMesh mesh;
-    
     addToMesh(mesh,_width);
-    
     return mesh;
+}
+
+glmRectangle glmPolyline::getBoundingBox() const {
+	glmRectangle box;
+    growToInclude(box);
+	return box;
+}
+
+void glmPolyline::growToInclude(glmRectangle &_bbox) const {
+    for(size_t i = 0; i < size(); i++) {
+        if(i == 0) {
+            _bbox.set(cartesians[i].x,cartesians[i].x,0,0);
+        } else {
+            _bbox.growToInclude(cartesians[i]);
+        }
+    }
 }

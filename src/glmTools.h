@@ -66,4 +66,75 @@ using namespace std;
 #define ABS(x) (((x) < 0) ? -(x) : (x))
 #endif
 
-#include "glmHelpers.h"
+double y2lat(double y) { return degrees(2. * atan(exp(radians(y))) - PI / 2); }
+double x2lon(double x) { return degrees(x / R_EARTH); }
+double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + radians(lat) / 2)); }
+double lon2x(double lon) { return radians(lon) * R_EARTH; }
+
+float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
+	if (fabs(inputMin - inputMax) < FLT_EPSILON){
+		return outputMin;
+	} else {
+		float outVal = ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin);
+        
+		if( clamp ){
+			if(outputMax < outputMin){
+				if( outVal < outputMax )outVal = outputMax;
+				else if( outVal > outputMin )outVal = outputMin;
+			}else{
+				if( outVal > outputMax )outVal = outputMax;
+				else if( outVal < outputMin )outVal = outputMin;
+			}
+		}
+		return outVal;
+	}
+}
+
+vec3 getCentroid(vector<vec3> &_pts){
+    vec3 centroid;
+    for (int i = 0; i < _pts.size(); i++) {
+        centroid += _pts[i] / (float)_pts.size();
+    }
+    return centroid;
+}
+
+void drawLine(const vec3 &_a, const vec3 &_b){
+    vec3 linePoints[2];
+    linePoints[0] = _a;
+    linePoints[1] = _b;
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(vec3), &linePoints[0].x);
+	glDrawArrays(GL_LINES, 0, 2);
+};
+
+bool lineSegmentIntersection(const vec3 &_line1Start, const vec3 &_line1End,
+                             const vec3 &_line2Start, const vec3 &_line2End,
+                             vec3 &_intersection ){
+	vec3 diffLA, diffLB;
+	double compareA, compareB;
+	diffLA = _line1End - _line1Start;
+	diffLB = _line2End - _line2Start;
+	compareA = diffLA.x*_line1Start.y - diffLA.y*_line1Start.x;
+	compareB = diffLB.x*_line2Start.y - diffLB.y*_line2Start.x;
+	if (
+		(
+         ( ( diffLA.x*_line2Start.y - diffLA.y*_line2Start.x ) < compareA ) ^
+         ( ( diffLA.x*_line2End.y - diffLA.y*_line2End.x ) < compareA )
+         )
+		&&
+		(
+         ( ( diffLB.x*_line1Start.y - diffLB.y*_line1Start.x ) < compareB ) ^
+         ( ( diffLB.x*_line1End.y - diffLB.y*_line1End.x) < compareB )
+         )
+        )
+	{
+		double lDetDivInv = 1 / ((diffLA.x*diffLB.y) - (diffLA.y*diffLB.x));
+		_intersection.x =  -((diffLA.x*compareB) - (compareA*diffLB.x)) * lDetDivInv ;
+		_intersection.y =  -((diffLA.y*compareB) - (compareA*diffLB.y)) * lDetDivInv ;
+        
+		return true;
+	}
+    
+	return false;
+};

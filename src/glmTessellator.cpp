@@ -67,7 +67,6 @@ void glmTessellator::tessellateToMesh( const glmPolyline& src,  PolyWindingMode 
 //----------------------------------------------------------
 void glmTessellator::tessellateToMesh( const vector<glmPolyline>& src, PolyWindingMode polyWindingMode, glmMesh & dstmesh, bool bIs2D ) {
     
-    
 	// pass vertex pointers to GLU tessellator
 	for ( int i=0; i<(int)src.size(); ++i ) {
 		glmPolyline& polyline = const_cast<glmPolyline&>(src[i]);
@@ -115,12 +114,14 @@ void glmTessellator::performTessellation(PolyWindingMode polyWindingMode, glmMes
     
 	dstmesh.clear();
 	dstmesh.addVertices((vec3*)tessGetVertices(cacheTess),numVertices);
-	dstmesh.addIndices((uint16_t*)tessGetElements(cacheTess),numIndices);
-	/*ofIndexType * tessElements = (ofIndexType *)tessGetElements(cacheTess);
-     for(int i=0;i<numIndices;i++){
-     if(tessElements[i]!=TESS_UNDEF)
-     dstmesh.addIndex(tessElements[i]);
-     }*/
+//	dstmesh.addIndices((uint16_t*)tessGetElements(cacheTess),numIndices);
+    
+	uint16_t * tessElements = (uint16_t *)tessGetElements(cacheTess);
+    for(int i=0;i<numIndices;i++){
+        if(tessElements[i]!=TESS_UNDEF)
+            dstmesh.addIndex(tessElements[i]);
+    }
+    
 //	dstmesh.setMode(OF_PRIMITIVE_TRIANGLES);
     
 }
