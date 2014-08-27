@@ -11,7 +11,8 @@
 #include "json/json.h"
 
 #include "glmTools.h"
-#include "glmMesh.h"
+#include "glmTileFeature.h"
+
 #include "glmPolyline.h"
 
 #include "tesselator.h"
@@ -28,19 +29,21 @@ public:
     bool load(int _tileX, int _tileY, int _zoom);
     void unload();
     
+    void draw();
+    
     int tileX, tileY, zoom;
     
-    vector<glmMesh> buildings;
-    vector<glmMesh> roads;
-    vector<glmMesh> earth;
-    vector<glmMesh> water;
+    vector<glmTileFeature> buildings;
+    vector<glmTileFeature> roads;
+    vector<glmTileFeature> earth;
+    vector<glmTileFeature> water;
     
-    vector<glmMesh> pois;
-    vector<glmMesh> places;
+    vector<glmTileFeature> pois;
+    vector<glmTileFeature> places;
 
 private:
-    vector<glmMesh> getLayerGeometry(string layerName);
-    void buildLayerGeometry(string layerName, vector<glmMesh> &_mesh, float minHeight = 0.);
+
+    void buildLayerGeometry(string layerName, vector<glmTileFeature> &_mesh, float minHeight = 0.);
     void lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float minHeight);
     void polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float minHeight, float height);
     

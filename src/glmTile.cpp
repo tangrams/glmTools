@@ -72,15 +72,7 @@ void glmTile::setGeometryOffset(vec3 _offset){
     m_geometryOffset = _offset;
 }
 
-vector<glmMesh> glmTile::getLayerGeometry(string layerName){
-    
-    vector<glmMesh> meshes;
-    buildLayerGeometry(layerName,meshes);
-    
-    return meshes;
-}
-
-void glmTile::buildLayerGeometry(string layerName, vector<glmMesh> &_meshes, float _minHeight) {
+void glmTile::buildLayerGeometry(string layerName, vector<glmTileFeature> &_features, float _minHeight) {
     
     Json::Value featureListJson = m_jsonRoot[layerName.c_str()]["features"];
     
@@ -116,30 +108,42 @@ void glmTile::buildLayerGeometry(string layerName, vector<glmMesh> &_meshes, flo
             
         } else if (geometryType.compare("LineString") == 0) {
             
-            glmMesh mesh;
-            lineJson2Mesh(geometryJson["coordinates"], mesh, _minHeight);
-            _meshes.push_back(mesh);
+            glmTileFeature feature;
+            
+            if (propsJson.isMember("name")) {
+                for (int i = 0; i < geometryJson["coordinates"].size(); i++) {
+                    feature.polyline.add(vec3(lon2x(geometryJson["coordinates"][i][0].asFloat()),
+                                              lat2y(geometryJson["coordinates"][i][1].asFloat()),
+                                              _minHeight) - m_geometryOffset);
+                }
+                feature.polyline.addToMesh(feature.geometry);
+                feature.name = propsJson["name"].asString();
+            } else {
+                lineJson2Mesh(geometryJson["coordinates"], feature.geometry, _minHeight);
+            }
+            
+            _features.push_back(feature);
             
         } else if (geometryType.compare("MultiLineString") == 0) {
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
-                glmMesh mesh;
-                lineJson2Mesh(geometryJson["coordinates"][j], mesh, _minHeight);
-                _meshes.push_back(mesh);
+                glmTileFeature feature;
+                lineJson2Mesh(geometryJson["coordinates"][j], feature.geometry, _minHeight);
+                _features.push_back(feature);
             }
             
         } else if (geometryType.compare("Polygon") == 0) {
             
-            glmMesh mesh;
-            polygonJson2Mesh(geometryJson["coordinates"], mesh, _minHeight + minHeight, height);
-            _meshes.push_back(mesh);
+            glmTileFeature feature;
+            polygonJson2Mesh(geometryJson["coordinates"], feature.geometry, _minHeight + minHeight, height);
+            _features.push_back(feature);
             
         } else if (geometryType.compare("MultiPolygon") == 0) {
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
-                glmMesh mesh;
-                polygonJson2Mesh(geometryJson["coordinates"][j], mesh, _minHeight + minHeight, height);
-                _meshes.push_back(mesh);
+                glmTileFeature feature;
+                polygonJson2Mesh(geometryJson["coordinates"][j], feature.geometry, _minHeight + minHeight, height);
+                _features.push_back(feature);
             }
             
         } else if (geometryType.compare("GeometryCollection") == 0) {
@@ -257,4 +261,26 @@ void glmTile::lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float _minHei
                           _minHeight) - m_geometryOffset);
     }
     polyline.addToMesh(_mesh);
+}
+
+void glmTile::draw(){
+    for (int i = 0; i < earth.size(); i++) {
+        glColor3f(0.0,0.9,0.0);
+        earth[i].geometry.draw();
+    }
+    
+    for (int i = 0; i < water.size(); i++) {
+        glColor3f(0.,0.,0.9);
+        water[i].geometry.draw();
+    }
+
+    for (int i = 0; i < roads.size(); i++) {
+        glColor3f(1.,1.,1.);
+        roads[i].geometry.draw();
+    }
+
+    for (int i = 0; i < buildings.size(); i++) {
+        glColor3f(0.9,0.2,0.0);
+        buildings[i].geometry.draw();
+    }
 }
