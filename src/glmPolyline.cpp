@@ -317,14 +317,11 @@ void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
     // Loop over intermediate points in the polyline
     //
     for (int i = 1; i < size() - 1; i++) {
-        
         im1 = i0;
         i0 = ip1;
-        
         ip1 = cartesians[i+1];
         
         normi = normip1;
-        
         normip1.x = ip1.y - i0.y;
         normip1.y = i0.x - ip1.x;
         normip1.z = 0.0f;

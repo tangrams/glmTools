@@ -6,11 +6,13 @@
 //
 //
 
-#include "glmLabel.h"
+#include "glmText.h"
 
 using namespace glm;
 
 void glmText::set(FTFont *_font, string _text){
+    
+    font = _font;
     
     content = _text;
     letters_width.clear();
@@ -36,10 +38,15 @@ void glmText::set(FTFont *_font, string _text){
     }
 }
 
-void drawText(FTFont *font, const glmText & _text, const glmPolyline &_polyline, double _offsetPct ){
+glmRectangle glmText::getBoundingBox(){
+    FTBBox bbox = font->BBox( &content[0], 1);
+    return glmRectangle(bbox.Lower().Xf(), bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+}
+
+void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct ){
     float width = _polyline.getLength()*_offsetPct;
     
-    for (int i = 0; i < _text.content.length(); i++) {
+    for (int i = 0; i < content.length(); i++) {
         
 //        while ( _polyline.getFractAt(width,10.) > 0.2) {
 //            width += 1.;
@@ -52,8 +59,8 @@ void drawText(FTFont *font, const glmText & _text, const glmPolyline &_polyline,
         glTranslated(src.x, src.y, src.z);
         glScalef(1,-1,1);
         glRotated(rot*RAD_TO_DEG, 0, 0, -1);
-        font->Render( &_text.content[i] , 1);
+        font->Render( &content[i] , 1);
         glPopMatrix();
-        width += _text.letters_width[i];
+        width += letters_width[i];
     }
 };

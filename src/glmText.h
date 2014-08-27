@@ -12,8 +12,7 @@
 
 #include "ftgl.h"
 #include "glmPolyline.h"
-
-using namespace std;
+#include "glmRectangle.h"
 
 class glmText{
 public:
@@ -21,9 +20,14 @@ public:
     glmText(){};
     void set(FTFont *_font, std::string _text);
     
+    glmRectangle getBoundingBox();
+    
+    void drawOnLine(const glmPolyline &_polyline, double _offsetPct = 0.);
+    
+private:
+    FTFont *font;
+    
     vector<float> letters_width;
     vector<float> words_width;
     string content;
 };
-
-void drawText(FTFont *font, const glmText & _text, const glmPolyline &_polyline, double _offsetPct = 0.);
