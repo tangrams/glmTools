@@ -39,6 +39,7 @@ public:
     
     vector<vec3> &getVertices();
     vector<vec3> &getNormals();
+    vector<uint16_t> &getIndices();
     
     void    clear();
     void    draw();

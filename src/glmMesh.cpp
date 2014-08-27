@@ -66,6 +66,10 @@ vector<vec3> & glmMesh::getNormals(){
     return normals;
 }
 
+vector<uint16_t> & glmMesh::getIndices(){
+    return indices;
+}
+
 void glmMesh::clear(){
     if(!vertices.empty()){
 		vertices.clear();

@@ -37,7 +37,6 @@ void glmPolyline::add(const vector<vec3> & _points){
 }
 
 void glmPolyline::addVertices(const vector<vec3>& verts) {
-
     for (int i = 0 ; i < verts.size() ; i++) {
         add(verts[i]);
     }
@@ -54,7 +53,7 @@ vec3& glmPolyline::operator [](const int &_index){
     return cartesians[_index];
 }
 
-double glmPolyline::getAngleAt(const double &_dist) const{
+float glmPolyline::getAngleAt(const float &_dist) const{
     
     if(polars.size() == 0 || distances.size() == 0){
         return -1;
@@ -71,7 +70,7 @@ double glmPolyline::getAngleAt(const double &_dist) const{
     return 0;
 }
 
-vec3 glmPolyline::getPositionAt(const double &_dist) const{
+vec3 glmPolyline::getPositionAt(const float &_dist) const{
     
     //  Todo fix this
     //
@@ -84,7 +83,7 @@ vec3 glmPolyline::getPositionAt(const double &_dist) const{
     
     for (int i = 1; i < distances.size(); i++) {
         if(_dist<=distances[i]){
-            double diff = _dist-distances[i];
+            float diff = _dist-distances[i];
             return vec3(cartesians[i].x + diff*cos(polars[i-1].a),
                              cartesians[i].y + diff*sin(polars[i-1].a),
                              0.0f);
@@ -94,11 +93,11 @@ vec3 glmPolyline::getPositionAt(const double &_dist) const{
     return cartesians[size()-1];
 }
 
-double glmPolyline::getFractAt(double _dist,double _offset)const{
-    double a = getAngleAt(_dist-_offset);
-    double b = getAngleAt(_dist+_offset);
+float glmPolyline::getFractAt(float _dist,float _offset)const{
+    float a = getAngleAt(_dist-_offset);
+    float b = getAngleAt(_dist+_offset);
     
-    double diff= (a - b);
+    float diff= (a - b);
     if (diff < -PI) diff += PI*2.;
     if (diff > PI) diff -= PI*2.;
     
@@ -137,7 +136,7 @@ static void simplifyDP(float tol, vec3* v, int j, int k, int* mk ){
     Segment S		= {v[j], v[k]};  // segment from v[j] to v[k]
     vec3 u;
 	u				= S.P1 - S.P0;   // segment direction vector
-    double  cu		= dot(u,u);     // segment length squared
+    float  cu		= dot(u,u);     // segment length squared
     
     // test each vertex v[i] for max distance from S
     // compute using the Feb 2001 Algorithm's dist_ofPoint_to_Segment()
@@ -176,7 +175,7 @@ static void simplifyDP(float tol, vec3* v, int j, int k, int* mk ){
     return;
 }
 
-void glmPolyline::simplify(double tol){
+void glmPolyline::simplify(float tol){
     if(cartesians.size() < 2) return;
     
 	int n = size();
@@ -229,7 +228,7 @@ void glmPolyline::updateCache(){
     polars.clear();
     distances.clear();
     
-    double total = 0;
+    float total = 0;
     for (int i = 1; i < size(); i++) {
         glmPolarPoint p = glmPolarPoint(cartesians[i-1],cartesians[i]);
         polars.push_back(p);
@@ -239,7 +238,7 @@ void glmPolyline::updateCache(){
     distances.push_back( total );
 }
 
-double glmPolyline::getLength(const int &_index) const {
+float glmPolyline::getLength(const int &_index) const {
     if(_index == -1){
         return distances[size()-1];
     } else if (_index >= size() || _index < 0){
@@ -273,7 +272,7 @@ void glmPolyline::drawPoints(){
 
 void glmPolyline::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
-        double angle = polars[i].a-HALF_PI;
+        float angle = polars[i].a-HALF_PI;
         
         vec3 head;
         head.x = polars[i].r * cos(angle);
@@ -286,7 +285,7 @@ void glmPolyline::drawNormals(){
 //  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
 //  https://www.mapbox.com/blog/drawing-antialiased-lines/
 //
-void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
+void glmPolyline::addToMesh(glmMesh &_mesh, float _width){
 
     //  From Matt code
     //
@@ -354,7 +353,7 @@ void glmPolyline::addToMesh(glmMesh &_mesh, double _width){
     _mesh.setDrawMode(GL_TRIANGLE_STRIP);
 }
 
-glmMesh glmPolyline::getMesh(double _width){
+glmMesh glmPolyline::getMesh(float _width){
     glmMesh mesh;
     addToMesh(mesh,_width);
     return mesh;
@@ -369,7 +368,7 @@ glmRectangle glmPolyline::getBoundingBox() const {
 void glmPolyline::growToInclude(glmRectangle &_bbox) const {
     for(size_t i = 0; i < size(); i++) {
         if(i == 0) {
-            _bbox.set(cartesians[i].x,cartesians[i].x,0,0);
+            _bbox.set(cartesians[i].x,cartesians[i].y,0.,0.);
         } else {
             _bbox.growToInclude(cartesians[i]);
         }

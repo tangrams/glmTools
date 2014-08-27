@@ -23,6 +23,7 @@ public:
     glmRectangle getBoundingBox();
     
     void drawOnLine(const glmPolyline &_polyline, double _offsetPct = 0.);
+    void drawOnRectangle(const glmRectangle &_rectangle);
     
 private:
     FTFont *font;

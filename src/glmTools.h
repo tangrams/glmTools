@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include <OpenGL/gl.h>
 
@@ -88,6 +89,20 @@ float mapValue(float value, float inputMin, float inputMax, float outputMin, flo
 		}
 		return outVal;
 	}
+}
+
+inline ostream& operator<<(ostream& os, const vec3& vec) {
+	os << vec.x << ", " << vec.y << ", " << vec.z;
+	return os;
+}
+
+inline istream& operator>>(istream& is, vec3& vec) {
+	is >> vec.x;
+	is.ignore(2);
+	is >> vec.y;
+	is.ignore(2);
+	is >> vec.z;
+	return is;
 }
 
 vec3 getCentroid(vector<vec3> &_pts){

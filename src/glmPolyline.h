@@ -22,7 +22,7 @@ struct glmPolarPoint {
         r = length(vec2(diff.x,diff.y));
 
     };
-    double a,r;
+    float a,r;
 };
 
 class glmPolyline {
@@ -34,23 +34,23 @@ public:
 	void    addVertices(const vec3* verts, int numverts);
     
     vec3&   operator [](const int &_index);
-    double  getLength(const int &_index = -1) const;
+    float  getLength(const int &_index = -1) const;
     
-    vec3    getPositionAt(const double &_dist) const;
-    double  getAngleAt(const double &_dist) const;
+    vec3    getPositionAt(const float &_dist) const;
+    float  getAngleAt(const float &_dist) const;
     
     vector<vec3> & getVertices();
-    double  getFractAt(double _dist,double _offset=1.)const;
-    glmMesh getMesh(double _width = 3.0);
+    float  getFractAt(float _dist,float _offset=1.)const;
+    glmMesh getMesh(float _width = 3.0);
 	glmRectangle getBoundingBox() const;
     void    growToInclude(glmRectangle &_bbox) const;
     
-    void    addToMesh(glmMesh &_mesh, double _width = 3.0);
+    void    addToMesh(glmMesh &_mesh, float _width = 3.0);
     
     int     size() const;
 
     void    clear();
-    void    simplify(double tolerance=0.3f);
+    void    simplify(float tolerance=0.3f);
     
     void    draw();
     void    drawPoints();
@@ -63,5 +63,5 @@ protected:
     //
     void    updateCache();
     vector<glmPolarPoint>  polars;
-    vector<double>         distances;
+    vector<float>         distances;
 };
