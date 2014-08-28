@@ -14,11 +14,16 @@
 glmTile::glmTile() {
 	m_tess = tessNewTess( NULL );
     m_geometryOffset = glm::vec3(0,0,0);
+    font = NULL;
 }
 
 glmTile::glmTile(std::string fileName) {
     glmTile();
     load(fileName);
+}
+
+void glmTile::setFont(FTFont *_font){
+    font = _font;
 }
 
 bool glmTile::load(int _tileX, int _tileY, int _zoom){
@@ -32,6 +37,7 @@ bool glmTile::load(int _tileX, int _tileY, int _zoom){
     
     //  TODO: get JSON file from the web
     //
+
 }
 
 bool glmTile::load(std::string _filename){
@@ -72,7 +78,7 @@ void glmTile::setGeometryOffset(glm::vec3 _offset){
     m_geometryOffset = _offset;
 }
 
-void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeature> &_features, float _minHeight) {
+void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatureRef> &_features, float _minHeight) {
     
     Json::Value featureListJson = m_jsonRoot[layerName.c_str()]["features"];
     
@@ -108,18 +114,18 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
             
         } else if (geometryType.compare("LineString") == 0) {
             
-            glmTileFeature feature;
+            glmTileFeatureRef feature(new glmTileFeature);
             
             if (propsJson.isMember("name")) {
                 for (int i = 0; i < geometryJson["coordinates"].size(); i++) {
-                    feature.polyline.add(glm::vec3(lon2x(geometryJson["coordinates"][i][0].asFloat()),
+                    feature->polyline.add(glm::vec3(lon2x(geometryJson["coordinates"][i][0].asFloat()),
                                                    lat2y(geometryJson["coordinates"][i][1].asFloat()),
                                                    _minHeight) - m_geometryOffset);
                 }
-                feature.polyline.addToMesh(feature.geometry);
-                feature.name = propsJson["name"].asString();
+                feature->polyline.addToMesh(feature->geometry,8.);
+                feature->text.set(font, propsJson["name"].asString());
             } else {
-                lineJson2Mesh(geometryJson["coordinates"], feature.geometry, _minHeight);
+                lineJson2Mesh(geometryJson["coordinates"], feature->geometry, _minHeight);
             }
             
             _features.push_back(feature);
@@ -127,22 +133,22 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
         } else if (geometryType.compare("MultiLineString") == 0) {
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
-                glmTileFeature feature;
-                lineJson2Mesh(geometryJson["coordinates"][j], feature.geometry, _minHeight);
+                glmTileFeatureRef feature(new glmTileFeature);
+                lineJson2Mesh(geometryJson["coordinates"][j], feature->geometry, _minHeight);
                 _features.push_back(feature);
             }
             
         } else if (geometryType.compare("Polygon") == 0) {
             
-            glmTileFeature feature;
-            polygonJson2Mesh(geometryJson["coordinates"], feature.geometry, _minHeight + minHeight, height);
+            glmTileFeatureRef feature(new glmTileFeature);
+            polygonJson2Mesh(geometryJson["coordinates"], feature->geometry, _minHeight + minHeight, height);
             _features.push_back(feature);
             
         } else if (geometryType.compare("MultiPolygon") == 0) {
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
-                glmTileFeature feature;
-                polygonJson2Mesh(geometryJson["coordinates"][j], feature.geometry, _minHeight + minHeight, height);
+                glmTileFeatureRef feature(new glmTileFeature);
+                polygonJson2Mesh(geometryJson["coordinates"][j], feature->geometry, _minHeight + minHeight, height);
                 _features.push_back(feature);
             }
             
@@ -266,21 +272,30 @@ void glmTile::lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float _minHei
 void glmTile::draw(){
     for (int i = 0; i < earth.size(); i++) {
         glColor3f(0.0,0.9,0.0);
-        earth[i].geometry.draw();
+        earth[i]->geometry.draw();
     }
     
     for (int i = 0; i < water.size(); i++) {
         glColor3f(0.,0.,0.9);
-        water[i].geometry.draw();
+        water[i]->geometry.draw();
     }
 
     for (int i = 0; i < roads.size(); i++) {
-        glColor3f(1.,1.,1.);
-        roads[i].geometry.draw();
+        glColor3f(0.1,0.1,0.1);
+        roads[i]->geometry.draw();
+        
+        if(roads[i]->polyline.size()>0){
+            glPushMatrix();
+            glTranslatef(0, 0, 1.);
+            glColor3f(1.,1.,1.);
+            roads[i]->text.drawOnLine(roads[i]->polyline,0.,0.5,false);
+            glPopMatrix();
+        }
     }
 
     for (int i = 0; i < buildings.size(); i++) {
-        glColor3f(0.9,0.2,0.0);
-        buildings[i].geometry.draw();
+        glColor3f(0.9,0.9,0.5);
+        buildings[i]->geometry.draw();
     }
+    
 }

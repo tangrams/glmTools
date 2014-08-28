@@ -8,23 +8,29 @@
 
 #pragma once
 
-#include <memory>
+//  TODO: use default one
+//
+//#include <memory>
+#include <tr1/memory>
+
 #include "glmPolyline.h"
 #include "glmMesh.h"
+#include "glmText.h"
 
 class glmTileFeature {
 public:
-    
+
     glmTileFeature(){};
     virtual ~glmTileFeature(){};
     
-    glmMesh     geometry;
-    glmPolyline polyline;
-    std::string      idString;
-    std::string      name;
+    glmMesh         geometry;
+    glmPolyline     polyline;
+    glmText         text;
+    
+    std::string     idString;
     
 private:
     
 };
 
-typedef std::auto_ptr<glmTileFeature> glmTileFeatureRef;
+typedef std::tr1::shared_ptr<glmTileFeature> glmTileFeatureRef;

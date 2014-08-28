@@ -22,11 +22,13 @@ public:
     
     glmRectangle getBoundingBox();
     
-    void drawOnLine(const glmPolyline &_polyline, double _offsetPct = 0.);
+    void drawOnLine(const glmPolyline &_polyline, double _lineOffsetPct = 0., double _hOffsetPct = 0., bool _twoD = true);
     void drawOnRectangle(const glmRectangle &_rectangle);
     
 private:
     FTFont *font;
+    
+    glmRectangle bBox;
     
     std::vector<float> letters_width;
     std::vector<float> words_width;

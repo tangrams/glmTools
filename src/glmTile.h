@@ -12,10 +12,10 @@
 
 #include "glmTools.h"
 #include "glmTileFeature.h"
-
 #include "glmPolyline.h"
 
 #include "tesselator.h"
+#include "ftgl.h"
 
 class glmTile {
 public:
@@ -23,6 +23,7 @@ public:
     glmTile();
     glmTile(std::string fileName);
     
+    void setFont(FTFont *_font);
     void setGeometryOffset(glm::vec3 _offset);
     
     bool load(std::string _fileName);
@@ -30,25 +31,25 @@ public:
     void unload();
     
     void draw();
-    
-    int tileX, tileY, zoom;
-    
-    std::vector<glmTileFeature> buildings;
-    std::vector<glmTileFeature> roads;
-    std::vector<glmTileFeature> earth;
-    std::vector<glmTileFeature> water;
-    
-    std::vector<glmTileFeature> pois;
-    std::vector<glmTileFeature> places;
+
+    std::vector<glmTileFeatureRef> buildings;
+    std::vector<glmTileFeatureRef> roads;
+    std::vector<glmTileFeatureRef> earth;
+    std::vector<glmTileFeatureRef> water;
+    std::vector<glmTileFeatureRef> pois;
+    std::vector<glmTileFeatureRef> places;
 
 private:
 
-    void buildLayerGeometry(std::string layerName, std::vector<glmTileFeature> &_mesh, float minHeight = 0.);
+    void buildLayerGeometry(std::string layerName, std::vector<glmTileFeatureRef> &_mesh, float minHeight = 0.);
     void lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float minHeight);
     void polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float minHeight, float height);
     
-    TESStesselator *m_tess;
     Json::Value m_jsonRoot;
-    
     glm::vec3   m_geometryOffset;
+    
+    TESStesselator  *m_tess;
+    FTFont          *font;
+    
+    int tileX, tileY, zoom;
 };

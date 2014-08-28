@@ -36,14 +36,16 @@ void glmText::set(FTFont *_font, std::string _text){
             word += &_text[i];
         }
     }
+    
+    FTBBox box = font->BBox( &content[0], 1);
+    bBox.set(box.Lower().Xf(), box.Lower().Yf(), box.Upper().Xf(), box.Upper().Yf());
 }
 
 glmRectangle glmText::getBoundingBox(){
-    FTBBox bbox = font->BBox( &content[0], 1);
-    return glmRectangle(bbox.Lower().Xf(), bbox.Lower().Yf(), bbox.Upper().Xf(), bbox.Upper().Yf());
+    return bBox;
 }
 
-void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct ){
+void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double _hOffsetPct, bool _twoD ){
     float width = _polyline.getLength()*_offsetPct;
     
     for (int i = 0; i < content.length(); i++) {
@@ -56,9 +58,15 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct ){
         double rot = _polyline.getAngleAt(width);
         
         glPushMatrix();
-        glTranslated(src.x, src.y, src.z);
-        glScalef(1,-1,1);
-        glRotated(rot*RAD_TO_DEG, 0, 0, -1);
+        glTranslated(src.x, src.y, src.z+2.);
+        
+        if(_twoD){
+            glScalef(1,-1,1);
+            glRotated(rot*RAD_TO_DEG, 0, 0, -1);
+        } else {
+            glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+        }
+        glTranslatef(0., -bBox.height*_hOffsetPct,0.);
         font->Render( &content[i] , 1);
         glPopMatrix();
         width += letters_width[i];

@@ -9,16 +9,11 @@
 #pragma once
 
 #include <vector>
-#include <string>
 #include <iostream>
-#include <fstream>
 
 #include <OpenGL/gl.h>
 
 #include "glm/glm.hpp"
-
-//using namespace glm;
-//using namespace std;
 
 #ifndef PI
 #define PI       3.14159265358979323846
