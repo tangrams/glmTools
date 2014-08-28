@@ -8,6 +8,7 @@
 #include "glmPolyline.h"
 
 #include <OpenGL/gl.h>
+#include "tesselator.h"
 
 int glmPolyline::size() const {
     return cartesians.size();
@@ -285,7 +286,7 @@ void glmPolyline::drawNormals(){
 //  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
 //  https://www.mapbox.com/blog/drawing-antialiased-lines/
 //
-void glmPolyline::addToMesh(glmMesh &_mesh, float _width){
+void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width){
 
     //  From Matt code
     //
@@ -353,10 +354,46 @@ void glmPolyline::addToMesh(glmMesh &_mesh, float _width){
     _mesh.setDrawMode(GL_TRIANGLE_STRIP);
 }
 
-glmMesh glmPolyline::getMesh(float _width){
-    glmMesh mesh;
-    addToMesh(mesh,_width);
-    return mesh;
+void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
+    TESStesselator *m_tess = tessNewTess(NULL);
+    
+    uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
+    glmRectangle bBox;
+    
+    _mesh.setDrawMode(GL_TRIANGLES);
+    
+    for (int i = 0; i < cartesians.size(); i++) {
+        // Add contour to tesselator
+        tessAddContour(m_tess, 3, &cartesians[0].x, sizeof(glm::vec3), cartesians.size());
+    }
+    
+    // Tessellate polygon into triangles
+    tessTesselate(m_tess, TESS_WINDING_NONZERO, TESS_POLYGONS, 3, 3, NULL);
+    
+    // Extract triangle elements from tessellator
+    
+    const int numIndices = tessGetElementCount(m_tess);
+    const TESSindex* indices = tessGetElements(m_tess);
+    
+    for (int i = 0; i < numIndices; i++) {
+        const TESSindex* poly = &indices[i*3];
+        for (int j = 0; j < 3; j++) {
+            _mesh.addIndex(poly[j] + indexOffset);
+        }
+    }
+    
+    const int numVertices = tessGetVertexCount(m_tess);
+    const float* vertices = tessGetVertices(m_tess);
+    for (int i = 0; i < numVertices; i++) {
+        
+        _mesh.addTexCoord(glm::vec2(mapValue(vertices[3*i],bBox.getMinX(),bBox.getMaxX(),0.,1.),
+                                    mapValue(vertices[3*i+1],bBox.getMinY(),bBox.getMaxY(),0.,1.)));
+        _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+        _mesh.addVertex(glm::vec3(vertices[3*i], vertices[3*i + 1], vertices[3*i + 2]));
+    }
+    
+    tessDeleteTess(m_tess);
+    delete m_tess;
 }
 
 glmRectangle glmPolyline::getBoundingBox() const {

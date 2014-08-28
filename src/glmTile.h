@@ -32,6 +32,8 @@ public:
     
     void draw();
 
+    std::vector<glmTileFeatureRef> labelFeatures;
+    
     std::vector<glmTileFeatureRef> buildings;
     std::vector<glmTileFeatureRef> roads;
     std::vector<glmTileFeatureRef> earth;
@@ -51,5 +53,6 @@ private:
     TESStesselator  *m_tess;
     FTFont          *font;
     
+    float   lineWidth;
     int tileX, tileY, zoom;
 };

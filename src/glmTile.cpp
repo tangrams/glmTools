@@ -15,6 +15,8 @@ glmTile::glmTile() {
 	m_tess = tessNewTess( NULL );
     m_geometryOffset = glm::vec3(0,0,0);
     font = NULL;
+    
+    lineWidth = 8.;
 }
 
 glmTile::glmTile(std::string fileName) {
@@ -122,8 +124,10 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
                                                    lat2y(geometryJson["coordinates"][i][1].asFloat()),
                                                    _minHeight) - m_geometryOffset);
                 }
-                feature->polyline.addToMesh(feature->geometry,8.);
+                feature->polyline.addAsLineToMesh(feature->geometry,lineWidth);
                 feature->text.set(font, propsJson["name"].asString());
+                
+                labelFeatures.push_back(feature);
             } else {
                 lineJson2Mesh(geometryJson["coordinates"], feature->geometry, _minHeight);
             }
@@ -266,7 +270,7 @@ void glmTile::lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float _minHei
                                lat2y(lineJson[i][1].asFloat()),
                                _minHeight) - m_geometryOffset);
     }
-    polyline.addToMesh(_mesh);
+    polyline.addAsLineToMesh(_mesh, lineWidth);
 }
 
 void glmTile::draw(){

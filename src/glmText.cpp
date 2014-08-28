@@ -37,7 +37,7 @@ void glmText::set(FTFont *_font, std::string _text){
         }
     }
     
-    FTBBox box = font->BBox( &content[0], 1);
+    FTBBox box = font->BBox(content.c_str(), -1, FTPoint());
     bBox.set(box.Lower().Xf(), box.Lower().Yf(), box.Upper().Xf(), box.Upper().Yf());
 }
 
@@ -46,29 +46,40 @@ glmRectangle glmText::getBoundingBox(){
 }
 
 void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double _hOffsetPct, bool _twoD ){
-    float width = _polyline.getLength()*_offsetPct;
-    
-    for (int i = 0; i < content.length(); i++) {
+
+    if( bBox.width < _polyline.getLength() ){   //  Does the text actually fits on line???
         
-//        while ( _polyline.getFractAt(width,10.) > 0.2) {
-//            width += 1.;
-//        }
-        
-        glm::vec3 src = _polyline.getPositionAt(width);
-        double rot = _polyline.getAngleAt(width);
-        
-        glPushMatrix();
-        glTranslated(src.x, src.y, src.z+2.);
-        
-        if(_twoD){
-            glScalef(1,-1,1);
-            glRotated(rot*RAD_TO_DEG, 0, 0, -1);
-        } else {
-            glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+        float offsetPct = _offsetPct;
+        while (_polyline.getLength()*offsetPct+bBox.width > _polyline.getLength()) {
+            offsetPct -= 0.01;
         }
-        glTranslatef(0., -bBox.height*_hOffsetPct,0.);
-        font->Render( &content[i] , 1);
-        glPopMatrix();
-        width += letters_width[i];
+    
+        float offset = _polyline.getLength()*offsetPct;
+        
+        for (int i = 0; i < content.length(); i++) {
+            
+            glm::vec3 src = _polyline.getPositionAt(offset);
+            double rot = _polyline.getAngleAt(offset);
+            
+            glPushMatrix();
+            glTranslated(src.x, src.y, src.z);
+            
+            if(_twoD){
+                glScalef(1,-1,1);
+                glRotated(rot*RAD_TO_DEG, 0, 0, -1);
+            } else {
+                glTranslated(0.,0.,2.);
+                glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+            }
+            glTranslatef(0., -bBox.height*_hOffsetPct,0.);
+            font->Render( &content[i] , 1);
+            glPopMatrix();
+            offset += letters_width[i];
+        }
+    } else {
+        
+        //  What to do if text don't fit on line
+        //
+        std::cout << "Text don't fit" << std::endl;
     }
 };

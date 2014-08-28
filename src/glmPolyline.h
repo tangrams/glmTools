@@ -41,11 +41,12 @@ public:
     
     std::vector<glm::vec3> & getVertices();
     float  getFractAt(float _dist,float _offset=1.)const;
-    glmMesh getMesh(float _width = 3.0);
+
 	glmRectangle getBoundingBox() const;
     void    growToInclude(glmRectangle &_bbox) const;
     
-    void    addToMesh(glmMesh &_mesh, float _width = 3.0);
+    void    addAsLineToMesh(glmMesh &_mesh, float _width = 3.0);
+    void    addAsShapeToMesh(glmMesh &_mesh);
     
     int     size() const;
 
