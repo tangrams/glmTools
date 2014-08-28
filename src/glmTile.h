@@ -21,11 +21,11 @@ class glmTile {
 public:
     
     glmTile();
-    glmTile(string fileName);
+    glmTile(std::string fileName);
     
-    void setGeometryOffset(vec3 _offset);
+    void setGeometryOffset(glm::vec3 _offset);
     
-    bool load(string _fileName);
+    bool load(std::string _fileName);
     bool load(int _tileX, int _tileY, int _zoom);
     void unload();
     
@@ -33,17 +33,17 @@ public:
     
     int tileX, tileY, zoom;
     
-    vector<glmTileFeature> buildings;
-    vector<glmTileFeature> roads;
-    vector<glmTileFeature> earth;
-    vector<glmTileFeature> water;
+    std::vector<glmTileFeature> buildings;
+    std::vector<glmTileFeature> roads;
+    std::vector<glmTileFeature> earth;
+    std::vector<glmTileFeature> water;
     
-    vector<glmTileFeature> pois;
-    vector<glmTileFeature> places;
+    std::vector<glmTileFeature> pois;
+    std::vector<glmTileFeature> places;
 
 private:
 
-    void buildLayerGeometry(string layerName, vector<glmTileFeature> &_mesh, float minHeight = 0.);
+    void buildLayerGeometry(std::string layerName, std::vector<glmTileFeature> &_mesh, float minHeight = 0.);
     void lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float minHeight);
     void polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float minHeight, float height);
     

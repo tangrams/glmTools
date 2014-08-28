@@ -10,7 +10,7 @@
 
 using namespace glm;
 
-void glmText::set(FTFont *_font, string _text){
+void glmText::set(FTFont *_font, std::string _text){
     
     font = _font;
     
@@ -18,7 +18,7 @@ void glmText::set(FTFont *_font, string _text){
     letters_width.clear();
     words_width.clear();
     
-    string word = "";
+    std::string word = "";
     double word_width = 0;
     
     for(int i = 0; i < _text.size(); i++){
@@ -52,7 +52,7 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct ){
 //            width += 1.;
 //        }
         
-        vec3 src = _polyline.getPositionAt(width);
+        glm::vec3 src = _polyline.getPositionAt(width);
         double rot = _polyline.getAngleAt(width);
         
         glPushMatrix();

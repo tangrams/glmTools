@@ -28,13 +28,13 @@ void glmRectangle::set(float _x, float _y, float _width, float _height){
 
 
 //----------------------------------------------------------
-vec3 glmRectangle::getMin() const {
-    return vec3(getMinX(),getMinY(),0.);
+glm::vec3 glmRectangle::getMin() const {
+    return glm::vec3(getMinX(),getMinY(),0.);
 }
 
 //----------------------------------------------------------
-vec3 glmRectangle::getMax() const {
-    return vec3(getMaxX(),getMaxY(),0.);
+glm::vec3 glmRectangle::getMax() const {
+    return glm::vec3(getMaxX(),getMaxY(),0.);
 }
 
 //----------------------------------------------------------
@@ -58,7 +58,7 @@ float glmRectangle::getMaxY() const {
 }
 
 bool glmRectangle::inside(float px, float py) const {
-	return inside(vec3(px,py,0.));
+	return inside(glm::vec3(px,py,0.));
 }
 
 float glmRectangle::getLeft() const {
@@ -81,27 +81,27 @@ float glmRectangle::getBottom() const {
 }
 
 //----------------------------------------------------------
-vec3 glmRectangle::getTopLeft() const {
+glm::vec3 glmRectangle::getTopLeft() const {
     return getMin();
 }
 
 //----------------------------------------------------------
-vec3 glmRectangle::getTopRight() const {
-    return vec3(getRight(),getTop(),0.);
+glm::vec3 glmRectangle::getTopRight() const {
+    return glm::vec3(getRight(),getTop(),0.);
 }
 
 //----------------------------------------------------------
-vec3 glmRectangle::getBottomLeft() const {
-    return vec3(getLeft(),getBottom(),0.);
+glm::vec3 glmRectangle::getBottomLeft() const {
+    return glm::vec3(getLeft(),getBottom(),0.);
 }
 
 //----------------------------------------------------------
-vec3 glmRectangle::getBottomRight() const {
+glm::vec3 glmRectangle::getBottomRight() const {
     return getMax();
 }
 
 //----------------------------------------------------------
-bool glmRectangle::inside(const vec3& p) const {
+bool glmRectangle::inside(const glm::vec3& p) const {
     return p.x > getMinX() && p.y > getMinY() &&
     p.x < getMaxX() && p.y < getMaxY();
 }
@@ -113,7 +113,7 @@ bool glmRectangle::inside(const glmRectangle& rect) const {
 }
 
 //----------------------------------------------------------
-bool glmRectangle::inside(const vec3& p0, const vec3& p1) const {
+bool glmRectangle::inside(const glm::vec3& p0, const glm::vec3& p1) const {
     // check to see if a line segment is inside the rectangle
     return inside(p0) && inside(p1);
 }
@@ -125,14 +125,14 @@ bool glmRectangle::intersects(const glmRectangle& rect) const {
 }
 
 //----------------------------------------------------------
-bool glmRectangle::intersects(const vec3& p0, const vec3& p1) const {
+bool glmRectangle::intersects(const glm::vec3& p0, const glm::vec3& p1) const {
     // check for a line intersection
-    vec3 p;
+    glm::vec3 p;
     
-    vec3 topLeft     = getTopLeft();
-    vec3 topRight    = getTopRight();
-    vec3 bottomRight = getBottomRight();
-    vec3 bottomLeft  = getBottomLeft();
+    glm::vec3 topLeft     = getTopLeft();
+    glm::vec3 topRight    = getTopRight();
+    glm::vec3 bottomRight = getBottomRight();
+    glm::vec3 bottomLeft  = getBottomLeft();
     
     return inside(p0) || // check end inside
     inside(p1) || // check end inside
@@ -142,7 +142,7 @@ bool glmRectangle::intersects(const vec3& p0, const vec3& p1) const {
     lineSegmentIntersection(p0, p1, bottomLeft,  topLeft,     p);   // cross left
 }
 
-void glmRectangle::growToInclude(const vec3& p){
+void glmRectangle::growToInclude(const glm::vec3& p){
     float x0 = MIN(getMinX(),p.x);
     float x1 = MAX(getMaxX(),p.x);
     float y0 = MIN(getMinY(),p.y);

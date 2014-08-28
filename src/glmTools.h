@@ -17,8 +17,8 @@
 
 #include "glm/glm.hpp"
 
-using namespace glm;
-using namespace std;
+//using namespace glm;
+//using namespace std;
 
 #ifndef PI
 #define PI       3.14159265358979323846
@@ -68,10 +68,10 @@ using namespace std;
 #define ABS(x) (((x) < 0) ? -(x) : (x))
 #endif
 
-double y2lat(double y) { return degrees(2. * atan(exp(radians(y))) - PI / 2); }
-double x2lon(double x) { return degrees(x / R_EARTH); }
-double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + radians(lat) / 2)); }
-double lon2x(double lon) { return radians(lon) * R_EARTH; }
+double y2lat(double y) { return glm::degrees(2. * atan(exp(glm::radians(y))) - PI / 2); }
+double x2lon(double x) { return glm::degrees(x / R_EARTH); }
+double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + glm::radians(lat) / 2)); }
+double lon2x(double lon) { return glm::radians(lon) * R_EARTH; }
 
 float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 	if (fabs(inputMin - inputMax) < FLT_EPSILON){
@@ -92,12 +92,12 @@ float mapValue(float value, float inputMin, float inputMax, float outputMin, flo
 	}
 }
 
-inline ostream& operator<<(ostream& os, const vec3& vec) {
+inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {
 	os << vec.x << ", " << vec.y << ", " << vec.z;
 	return os;
 }
 
-inline istream& operator>>(istream& is, vec3& vec) {
+inline std::istream& operator>>(std::istream& is, glm::vec3& vec) {
 	is >> vec.x;
 	is.ignore(2);
 	is >> vec.y;
@@ -106,28 +106,28 @@ inline istream& operator>>(istream& is, vec3& vec) {
 	return is;
 }
 
-vec3 getCentroid(vector<vec3> &_pts){
-    vec3 centroid;
+glm::vec3 getCentroid(std::vector<glm::vec3> &_pts){
+    glm::vec3 centroid;
     for (int i = 0; i < _pts.size(); i++) {
         centroid += _pts[i] / (float)_pts.size();
     }
     return centroid;
 }
 
-void drawLine(const vec3 &_a, const vec3 &_b){
-    vec3 linePoints[2];
+void drawLine(const glm::vec3 &_a, const glm::vec3 &_b){
+    glm::vec3 linePoints[2];
     linePoints[0] = _a;
     linePoints[1] = _b;
     
     glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, sizeof(vec3), &linePoints[0].x);
+	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
 	glDrawArrays(GL_LINES, 0, 2);
 };
 
-bool lineSegmentIntersection(const vec3 &_line1Start, const vec3 &_line1End,
-                             const vec3 &_line2Start, const vec3 &_line2End,
-                             vec3 &_intersection ){
-	vec3 diffLA, diffLB;
+bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_line1End,
+                             const glm::vec3 &_line2Start, const glm::vec3 &_line2End,
+                             glm::vec3 &_intersection ){
+	glm::vec3 diffLA, diffLB;
 	double compareA, compareB;
 	diffLA = _line1End - _line1Start;
 	diffLB = _line2End - _line2Start;

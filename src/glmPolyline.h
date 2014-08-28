@@ -12,14 +12,14 @@
 #include "glmRectangle.h"
 
 struct glmPolarPoint {
-    glmPolarPoint(const vec3 &_org, const vec3 &_dst){
+    glmPolarPoint(const glm::vec3 &_org, const glm::vec3 &_dst){
         
         //  TODO: pass this to 3D
         //
         
-        vec3 diff = _dst - _org;
+        glm::vec3 diff = _dst - _org;
         a = atan2(diff.y,diff.x);
-        r = length(vec2(diff.x,diff.y));
+        r = glm::length(glm::vec2(diff.x,diff.y));
 
     };
     float a,r;
@@ -28,18 +28,18 @@ struct glmPolarPoint {
 class glmPolyline {
 public:
     
-    void    add(const vec3 &_point);
-    void    add(const vector<vec3> & _points);
-    void    addVertices( const vector<vec3>& verts );
-	void    addVertices(const vec3* verts, int numverts);
+    void    add(const glm::vec3 &_point);
+    void    add(const std::vector<glm::vec3> & _points);
+    void    addVertices( const std::vector<glm::vec3>& verts );
+	void    addVertices(const glm::vec3* verts, int numverts);
     
-    vec3&   operator [](const int &_index);
+    glm::vec3&   operator [](const int &_index);
     float  getLength(const int &_index = -1) const;
     
-    vec3    getPositionAt(const float &_dist) const;
+    glm::vec3    getPositionAt(const float &_dist) const;
     float  getAngleAt(const float &_dist) const;
     
-    vector<vec3> & getVertices();
+    std::vector<glm::vec3> & getVertices();
     float  getFractAt(float _dist,float _offset=1.)const;
     glmMesh getMesh(float _width = 3.0);
 	glmRectangle getBoundingBox() const;
@@ -57,11 +57,11 @@ public:
     void    drawNormals();
 
 protected:
-    vector<vec3>    cartesians;
+    std::vector<glm::vec3>    cartesians;
     
     //  Cached data
     //
     void    updateCache();
-    vector<glmPolarPoint>  polars;
-    vector<float>         distances;
+    std::vector<glmPolarPoint>  polars;
+    std::vector<float>         distances;
 };

@@ -28,7 +28,7 @@ public:
 private:
     FTFont *font;
     
-    vector<float> letters_width;
-    vector<float> words_width;
-    string content;
+    std::vector<float> letters_width;
+    std::vector<float> words_width;
+    std::string content;
 };

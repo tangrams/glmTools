@@ -20,15 +20,11 @@ public:
     
     glmMesh     geometry;
     glmPolyline polyline;
-    string      idString;
-    string      name;
-    
-    void draw(){
-        geometry.draw();
-    }
+    std::string      idString;
+    std::string      name;
     
 private:
     
 };
 
-typedef auto_ptr<glmTileFeature> glmTileFeatureRef;
+typedef std::auto_ptr<glmTileFeature> glmTileFeatureRef;
