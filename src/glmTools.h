@@ -14,6 +14,7 @@
 #include <OpenGL/gl.h>
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #ifndef PI
 #define PI       3.14159265358979323846
@@ -67,6 +68,27 @@ double y2lat(double y) { return glm::degrees(2. * atan(exp(glm::radians(y))) - P
 double x2lon(double x) { return glm::degrees(x / R_EARTH); }
 double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + glm::radians(lat) / 2)); }
 double lon2x(double lon) { return glm::radians(lon) * R_EARTH; }
+
+glm::vec3 worldToScreen(const glm::vec3 &_worldPos){
+    glm::ivec4 viewport;
+    glm::mat4x4 mvmatrix, projmatrix;
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
+    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
+    
+    return glm::project(_worldPos, mvmatrix, projmatrix, viewport);
+}
+
+glm::vec3 screenToWorld(const glm::vec3 &_screenPos){
+    glm::ivec4 viewport;
+    glm::mat4x4 mvmatrix, projmatrix;
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
+    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
+    
+    return glm::unProject(_screenPos, mvmatrix, projmatrix, viewport);
+}
+
 
 float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 	if (fabs(inputMin - inputMax) < FLT_EPSILON){

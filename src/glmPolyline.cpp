@@ -397,7 +397,6 @@ void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
     }
     
     tessDeleteTess(m_tess);
-    delete m_tess;
 }
 
 glmRectangle glmPolyline::getBoundingBox() const {
@@ -414,4 +413,21 @@ void glmPolyline::growToInclude(glmRectangle &_bbox) const {
             _bbox.growToInclude(cartesians[i]);
         }
     }
+}
+
+glmPolyline glmPolyline::getUnProjected(){
+    
+    glm::ivec4 viewport;
+    glm::mat4x4 mvmatrix, projmatrix;
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
+    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
+    
+    glmPolyline unprojected;
+    for (int i = 0; i < size(); i++) {
+        unprojected.add(glm::project(cartesians[i], mvmatrix, projmatrix, viewport));
+    }
+	
+    return unprojected;
+    
 }

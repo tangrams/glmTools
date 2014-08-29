@@ -33,17 +33,20 @@ public:
     void    addVertices( const std::vector<glm::vec3>& verts );
 	void    addVertices(const glm::vec3* verts, int numverts);
     
-    glm::vec3&   operator [](const int &_index);
-    glm::vec3    operator [](const int &_index) const;
-    float  getLength(const int &_index = -1) const;
+    glm::vec3&  operator [](const int &_index);
+    glm::vec3   operator [](const int &_index) const;
+    float   getLength(const int &_index = -1) const;
     
-    glm::vec3    getPositionAt(const float &_dist) const;
-    float  getAngleAt(const float &_dist) const;
+    glm::vec3   getPositionAt(const float &_dist) const;
+    float   getAngleAt(const float &_dist) const;
     
     std::vector<glm::vec3> & getVertices();
-    float  getFractAt(float _dist,float _offset=1.)const;
+    float   getFractAt(float _dist,float _offset=1.)const;
 
 	glmRectangle getBoundingBox() const;
+    
+    glmPolyline  getUnProjected();
+    
     void    growToInclude(glmRectangle &_bbox) const;
     
     void    addAsLineToMesh(glmMesh &_mesh, float _width = 3.0);
