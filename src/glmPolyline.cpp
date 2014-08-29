@@ -54,6 +54,10 @@ glm::vec3& glmPolyline::operator [](const int &_index){
     return cartesians[_index];
 }
 
+glm::vec3 glmPolyline::operator [](const int &_index) const {
+    return cartesians[_index];
+}
+
 float glmPolyline::getAngleAt(const float &_dist) const{
     
     if(polars.size() == 0 || distances.size() == 0){

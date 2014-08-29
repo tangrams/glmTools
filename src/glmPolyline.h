@@ -34,6 +34,7 @@ public:
 	void    addVertices(const glm::vec3* verts, int numverts);
     
     glm::vec3&   operator [](const int &_index);
+    glm::vec3    operator [](const int &_index) const;
     float  getLength(const int &_index = -1) const;
     
     glm::vec3    getPositionAt(const float &_dist) const;

@@ -49,6 +49,8 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
 
     if( bBox.width < _polyline.getLength() ){   //  Does the text actually fits on line???
         
+        //  Ancher point
+        //
         float offsetPct = _offsetPct;
         while (_polyline.getLength()*offsetPct+bBox.width > _polyline.getLength()) {
             offsetPct -= 0.01;
@@ -56,30 +58,64 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
     
         float offset = _polyline.getLength()*offsetPct;
         
-        for (int i = 0; i < content.length(); i++) {
-            
-            glm::vec3 src = _polyline.getPositionAt(offset);
-            double rot = _polyline.getAngleAt(offset);
-            
-            glPushMatrix();
-            glTranslated(src.x, src.y, src.z);
-            
-            if(_twoD){
-                glScalef(1,-1,1);
-                glRotated(rot*RAD_TO_DEG, 0, 0, -1);
-            } else {
-                glTranslated(0.,0.,2.);
-                glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+        //  Horientation
+        //
+        float angle = PI;
+        
+        if(_twoD){
+            glm::vec3 diff = _polyline[0]-_polyline[_polyline.size()-1];
+            angle = atan2f(-diff.y, diff.x);
+        }
+        
+        if(angle < PI*0.5 && angle > - PI*0.5){
+            for (int i = content.length()-1; i >=0 ; i--) {
+                
+                glm::vec3 src = _polyline.getPositionAt(offset);
+                double rot = _polyline.getAngleAt(offset);
+                
+                glPushMatrix();
+                glTranslated(src.x, src.y, src.z);
+                
+                if(_twoD){
+                    glScalef(1,-1,1);
+                    glRotated(rot*RAD_TO_DEG, 0, 0, -1);
+                } else {
+                    glTranslated(0.,0.,2.);
+                    glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+                }
+                
+                glScaled(-1, -1, 1);
+                glTranslated(-letters_width[i], 0, 0);
+                
+                glTranslatef(0., -bBox.height*_hOffsetPct,0.);
+                font->Render( &content[i] , 1);
+                glPopMatrix();
+                offset += letters_width[i];
             }
-            glTranslatef(0., -bBox.height*_hOffsetPct,0.);
-            font->Render( &content[i] , 1);
-            glPopMatrix();
-            offset += letters_width[i];
+        } else {
+            for (int i = 0; i < content.length(); i++) {
+                
+                glm::vec3 src = _polyline.getPositionAt(offset);
+                double rot = _polyline.getAngleAt(offset);
+                
+                glPushMatrix();
+                glTranslated(src.x, src.y, src.z);
+                
+                if(_twoD){
+                    glScalef(1,-1,1);
+                    glRotated(rot*RAD_TO_DEG, 0, 0, -1);
+                } else {
+                    glTranslated(0.,0.,2.);
+                    glRotated(rot*RAD_TO_DEG, 0, 0, 1);
+                }
+                
+                glTranslatef(0., -bBox.height*_hOffsetPct,0.);
+                font->Render( &content[i] , 1);
+                glPopMatrix();
+                offset += letters_width[i];
+            }
         }
     } else {
-        
-        //  What to do if text don't fit on line
-        //
-        std::cout << "Text don't fit" << std::endl;
+        // TODO: what happen if don't fit ??
     }
 };
