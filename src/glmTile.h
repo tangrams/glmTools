@@ -50,7 +50,6 @@ private:
     Json::Value m_jsonRoot;
     glm::vec3   m_geometryOffset;
     
-    TESStesselator  *m_tess;
     FTFont          *font;
     
     float   lineWidth;

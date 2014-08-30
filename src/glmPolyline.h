@@ -47,8 +47,7 @@ public:
     
     glmPolyline  getUnProjected();
     
-    void    growToInclude(glmRectangle &_bbox) const;
-    
+    void    addToBoundingBox(glmRectangle &_bbox) const;
     void    addAsLineToMesh(glmMesh &_mesh, float _width = 3.0);
     void    addAsShapeToMesh(glmMesh &_mesh);
     

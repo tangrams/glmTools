@@ -362,10 +362,9 @@ void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
     TESStesselator *m_tess = tessNewTess(NULL);
     
     uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
-    glmRectangle bBox;
-    
+    glmRectangle bBox = getBoundingBox();
+
     _mesh.setDrawMode(GL_TRIANGLES);
-    
     for (int i = 0; i < cartesians.size(); i++) {
         // Add contour to tesselator
         tessAddContour(m_tess, 3, &cartesians[0].x, sizeof(glm::vec3), cartesians.size());
@@ -401,11 +400,11 @@ void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
 
 glmRectangle glmPolyline::getBoundingBox() const {
 	glmRectangle box;
-    growToInclude(box);
+    addToBoundingBox(box);
 	return box;
 }
 
-void glmPolyline::growToInclude(glmRectangle &_bbox) const {
+void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
     for(size_t i = 0; i < size(); i++) {
         if(i == 0) {
             _bbox.set(cartesians[i].x,cartesians[i].y,0.,0.);

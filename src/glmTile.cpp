@@ -12,7 +12,6 @@
 #include <utility>
 
 glmTile::glmTile() {
-	m_tess = tessNewTess( NULL );
     m_geometryOffset = glm::vec3(0,0,0);
     font = NULL;
     
@@ -39,7 +38,6 @@ bool glmTile::load(int _tileX, int _tileY, int _zoom){
     
     //  TODO: get JSON file from the web
     //
-
 }
 
 bool glmTile::load(std::string _filename){
@@ -166,31 +164,26 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
 }
 
 void glmTile::polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float minHeight, float height) {
-    m_tess = tessNewTess(NULL);
-    
-    uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
-    glmRectangle bBox;
-    
     _mesh.setDrawMode(GL_TRIANGLES);
-    
+
     std::vector<glmPolyline> polyLines;
     for (int i = 0; i < polygonJson.size(); i++) {
         
-        glmPolyline ringCoords;
+        uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
         
+        glmPolyline ringCoords;
         int nRingVerts = polygonJson[0].size();
         for (int i = 0; i < nRingVerts; i++) {
             ringCoords.add(glm::vec3(lon2x(polygonJson[0][i][0].asFloat()),
                                      lat2y(polygonJson[0][i][1].asFloat()),
-                                     minHeight) - m_geometryOffset);
+                                     height) - m_geometryOffset);
         }
         
         // Extrude polygon based on height
         if (height != minHeight) {
             
             glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
-            glm::vec3 tan;
-            glm::vec3 nor;
+            glm::vec3 tan, nor;
             
             for (int i = 0; i < ringCoords.size() - 1; i++) {
                 
@@ -209,10 +202,10 @@ void glmTile::polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float m
                 _mesh.addNormal(nor);
                 
                 _mesh.addTexCoord(glm::vec2(1.,1.));
-                _mesh.addVertex(ip0+glm::vec3(0.,0.,height - m_geometryOffset.z));
+                _mesh.addVertex(ip0+glm::vec3(0.,0.,minHeight - height - m_geometryOffset.z));
                 _mesh.addNormal(nor);
                 _mesh.addTexCoord(glm::vec2(0.,1.));
-                _mesh.addVertex(ip1+glm::vec3(0.,0.,height - m_geometryOffset.z));
+                _mesh.addVertex(ip1+glm::vec3(0.,0.,minHeight - height - m_geometryOffset.z));
                 _mesh.addNormal(nor);
                 
                 _mesh.addIndex(indexOffset);
@@ -225,42 +218,8 @@ void glmTile::polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float m
                 indexOffset += 4;
             }
         }
-        
-        ringCoords.growToInclude(bBox);
-        polyLines.push_back(ringCoords);
+        ringCoords.addAsShapeToMesh(_mesh);
     }
-    
-    for (int i = 0; i < polyLines.size(); i++) {
-        // Add contour to tesselator
-        tessAddContour(m_tess, 3, &polyLines[i][0].x, sizeof(glm::vec3), polyLines[i].size());
-    }
-    
-    // Tessellate polygon into triangles
-    tessTesselate(m_tess, TESS_WINDING_NONZERO, TESS_POLYGONS, 3, 3, NULL);
-    
-    // Extract triangle elements from tessellator
-    
-    const int numIndices = tessGetElementCount(m_tess);
-    const TESSindex* indices = tessGetElements(m_tess);
-    
-    for (int i = 0; i < numIndices; i++) {
-        const TESSindex* poly = &indices[i*3];
-        for (int j = 0; j < 3; j++) {
-            _mesh.addIndex(poly[j] + indexOffset);
-        }
-    }
-    
-    const int numVertices = tessGetVertexCount(m_tess);
-    const float* vertices = tessGetVertices(m_tess);
-    for (int i = 0; i < numVertices; i++) {
-        
-        _mesh.addTexCoord(glm::vec2(mapValue(vertices[3*i],bBox.getMinX(),bBox.getMaxX(),0.,1.),
-                                    mapValue(vertices[3*i+1],bBox.getMinY(),bBox.getMaxY(),0.,1.)));
-        _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-        _mesh.addVertex(glm::vec3(vertices[3*i], vertices[3*i + 1], vertices[3*i + 2] + height));
-    }
-    
-    tessDeleteTess(m_tess);
 }
 
 void glmTile::lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float _minHeight){
