@@ -100,6 +100,10 @@ glm::vec3 glmRectangle::getBottomRight() const {
     return getMax();
 }
 
+glm::vec3  glmRectangle::getCenter() const {
+	return glm::vec3(x + width * 0.5f, y + height * 0.5f, 0.0);
+}
+
 //----------------------------------------------------------
 bool glmRectangle::inside(const glm::vec3& p) const {
     return p.x > getMinX() && p.y > getMinY() &&
@@ -150,4 +154,16 @@ void glmRectangle::growToInclude(const glm::vec3& p){
     float w = x1 - x0;
     float h = y1 - y0;
     set(x0,y0,w,h);
+}
+
+void glmRectangle::drawBorders(){
+    glm::vec3 linePoints[5] = {getTopLeft(), getTopRight(), getBottomRight(), getBottomLeft(), getTopLeft()};
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glDrawArrays(GL_LINE_STRIP, 0, 5);
+}
+
+void glmRectangle::drawCorners(const float &_width){
+    
 }

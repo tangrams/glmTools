@@ -131,6 +131,18 @@ glm::vec3 getCentroid(std::vector<glm::vec3> &_pts){
     return centroid;
 }
 
+void drawCross(const glm::vec3 &_pos, const float &_width = 3.5){
+    glm::vec3 linePoints[4] = {_pos, _pos, _pos, _pos};
+    linePoints[0].x -= _width;
+    linePoints[1].x += _width;
+    linePoints[2].y -= _width;
+    linePoints[3].y += _width;
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glDrawArrays(GL_LINES, 0, 4);
+}
+
 void drawLine(const glm::vec3 &_a, const glm::vec3 &_b){
     glm::vec3 linePoints[2];
     linePoints[0] = _a;

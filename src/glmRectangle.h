@@ -41,10 +41,15 @@ public:
     float   getTop()    const;
     float   getBottom() const;
     
+    glm::vec3   getCenter() const;
+    
     glm::vec3    getTopLeft() const;
     glm::vec3    getTopRight() const;
     glm::vec3    getBottomLeft() const;
     glm::vec3    getBottomRight() const;
+    
+    void drawBorders();
+    void drawCorners(const float &_width = 3.);
     
     float   x,y,width,height;
 };
