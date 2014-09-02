@@ -8,18 +8,33 @@
 
 #include "glmRectangle.h"
 
-glmRectangle::glmRectangle(){
-    x = 0.0;
-    y = 0.0;
-    width = 0.0;
-    height = 0.0;
+glmRectangle::glmRectangle():
+x(0.0), y(0.0), width(0.0), height(0.0)
+{
+
 }
 
-glmRectangle::glmRectangle(float _x, float _y, float _width, float _height){
+glmRectangle::glmRectangle(const glm::vec4 &_vec4){
+    set(_vec4);
+}
+
+glmRectangle::glmRectangle(const glm::ivec4 &_vec4){
+    set(_vec4);
+}
+
+glmRectangle::glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height){
     set(_x, _y, _width, _height);
 }
 
-void glmRectangle::set(float _x, float _y, float _width, float _height){
+void glmRectangle::set(const glm::vec4 &_vec4){
+    set(_vec4.x, _vec4.y, _vec4.z, _vec4.w);
+}
+
+void glmRectangle::set(const glm::ivec4 &_vec4){
+    set(_vec4.x, _vec4.y, _vec4.z, _vec4.w);
+}
+
+void glmRectangle::set(const float &_x, const float &_y, const float &_width, const float &_height){
     x = _x;
     y = _y;
     width = _width;
@@ -57,8 +72,8 @@ float glmRectangle::getMaxY() const {
     return MAX(y, y + height);  // - height
 }
 
-bool glmRectangle::inside(float px, float py) const {
-	return inside(glm::vec3(px,py,0.));
+bool glmRectangle::inside(const float &_px, const float &_py) const {
+	return inside(glm::vec3(_px,_py,0.));
 }
 
 float glmRectangle::getLeft() const {
@@ -113,7 +128,7 @@ bool glmRectangle::inside(const glm::vec3& p) const {
 //----------------------------------------------------------
 bool glmRectangle::inside(const glmRectangle& rect) const {
     return inside(rect.getMinX(),rect.getMinY()) &&
-    inside(rect.getMaxX(),rect.getMaxY());
+            inside(rect.getMaxX(),rect.getMaxY());
 }
 
 //----------------------------------------------------------
@@ -165,5 +180,23 @@ void glmRectangle::drawBorders(){
 }
 
 void glmRectangle::drawCorners(const float &_width){
+    glm::vec3 linePoints[16] = {getTopLeft(), getTopLeft(),getTopLeft(), getTopLeft(),
+                               getTopRight(), getTopRight(),getTopRight(), getTopRight(),
+                               getBottomRight(), getBottomRight(),getBottomRight(), getBottomRight(),
+                               getBottomLeft(), getBottomLeft(),getBottomLeft(), getBottomLeft() };
+    linePoints[0].x += _width;
+    linePoints[3].y += _width;
     
+    linePoints[4].x -= _width;
+    linePoints[7].y += _width;
+    
+    linePoints[8].x -= _width;
+    linePoints[11].y -= _width;
+    
+    linePoints[12].x += _width;
+    linePoints[15].y -= _width;
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glDrawArrays(GL_LINES, 0, 16);
 }

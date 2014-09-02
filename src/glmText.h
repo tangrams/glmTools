@@ -27,7 +27,6 @@ public:
     
 private:
     FTFont *font;
-    
     glmRectangle bBox;
     
     std::vector<float> letters_width;

@@ -46,28 +46,37 @@ glmRectangle glmText::getBoundingBox(){
 }
 
 void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double _hOffsetPct, bool _twoD ){
+    
+    float lineLength = _polyline.getLength();
+    
+    if(lineLength<0.0){
+        return;
+    }
 
-    if( bBox.width < _polyline.getLength() ){   //  Does the text actually fits on line???
+    if( bBox.width < lineLength && _polyline.size() > 1.0){   //  Does the text actually fits on line???
         
         //  Ancher point
         //
         float offsetPct = _offsetPct;
-        while (_polyline.getLength()*offsetPct+bBox.width > _polyline.getLength()) {
+        float labelOffsetPct = _offsetPct;
+        while (lineLength*offsetPct - bBox.width*_offsetPct + bBox.width > lineLength) {
             offsetPct -= 0.01;
         }
-    
-        float offset = _polyline.getLength()*offsetPct;
         
-        //  Horientation
+        float offset = lineLength*offsetPct-bBox.width*_offsetPct;
+        if(offset<0.0|| offset > lineLength){
+            return;
+        }
+        
+        //  Orientation
         //
         float angle = PI;
-        
         if(_twoD){
             glm::vec3 diff = _polyline[0]-_polyline[_polyline.size()-1];
             angle = atan2f(-diff.y, diff.x);
         }
         
-        if(angle < PI*0.5 && angle > - PI*0.5){
+        if(angle < PI*0.5 && angle > -PI*0.5){
             for (int i = content.length()-1; i >=0 ; i--) {
                 
                 glm::vec3 src = _polyline.getPositionAt(offset);

@@ -14,19 +14,22 @@ class glmRectangle {
 public:
     
     glmRectangle();
-    glmRectangle(float _x, float _y, float _width, float _height);
+    glmRectangle(const glm::vec4 &_vec4);
+    glmRectangle(const glm::ivec4 &_viewPort);
+    glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height);
     
-    void    set(float _x, float _y, float _width, float _height);
-    
+    void    set(const glm::vec4 &_vec4);
+    void    set(const glm::ivec4 &_viewPort);
+    void    set(const float &_x, const float &_y, const float &_width, const float &_height);
     void    growToInclude(const glm::vec3& p);
     
-    bool    inside(float px, float py) const;
-    bool    inside(const glm::vec3& p) const;
-    bool    inside(const glmRectangle& rect) const;
+    bool    inside(const float &_px, const float &_py) const;
+    bool    inside(const glm::vec3& _p) const;
+    bool    inside(const glmRectangle& _rect) const;
     bool    inside(const glm::vec3& p0, const glm::vec3& p1) const;
     
-    bool    intersects(const glmRectangle& rect) const;
-    bool    intersects(const glm::vec3& p0, const glm::vec3& p1) const;
+    bool    intersects(const glmRectangle& _rect) const;
+    bool    intersects(const glm::vec3& _p0, const glm::vec3& _p1) const;
     
     glm::vec3    getMin() const;
     glm::vec3    getMax() const;

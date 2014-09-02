@@ -77,13 +77,14 @@ float glmPolyline::getAngleAt(const float &_dist) const{
 
 glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
     
-    //  Todo fix this
+    //  TODO: This can be done better maybe with some C++11 magic!
     //
     
     if (size()==2) {
-        return glm::vec3(_dist*cos(polars[0].a),
-                         _dist*sin(polars[0].a),
-                         0.0f);
+        return cartesians[0] + glm::vec3(_dist*cos(polars[0].a),
+                                         _dist*sin(polars[0].a),
+                                         0.0f);
+        
     }
     
     for (int i = 1; i < distances.size(); i++) {
@@ -244,9 +245,12 @@ void glmPolyline::updateCache(){
 }
 
 float glmPolyline::getLength(const int &_index) const {
-    if(_index == -1){
+    
+    if(_index >= size() || size() == 0){
+        return -1;
+    } else if(_index == -1){
         return distances[size()-1];
-    } else if (_index >= size() || _index < 0){
+    } else if ( _index < 0){
         return 0;
     } else {
         return distances[_index];
@@ -258,11 +262,14 @@ std::vector<glm::vec3> & glmPolyline::getVertices(){
 }
 
 void glmPolyline::draw(){
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, 0x1111);
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {
         glVertex2d(cartesians[i].x,cartesians[i].y);
     }
     glEnd();
+    glDisable(GL_LINE_STIPPLE);
 }
 
 void glmPolyline::drawPoints(){
@@ -424,7 +431,10 @@ glmPolyline glmPolyline::getUnProjected(){
     
     glmPolyline unprojected;
     for (int i = 0; i < size(); i++) {
-        unprojected.add(glm::project(cartesians[i], mvmatrix, projmatrix, viewport));
+        glm::vec3 v = glm::project(cartesians[i], mvmatrix, projmatrix, viewport);
+        if( v.z >= 0.0 && v.z <= 1.0){
+            unprojected.add(v);
+        }
     }
 	
     return unprojected;

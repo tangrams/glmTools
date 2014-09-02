@@ -153,6 +153,19 @@ void drawLine(const glm::vec3 &_a, const glm::vec3 &_b){
 	glDrawArrays(GL_LINES, 0, 2);
 };
 
+void drawStippleLine(const glm::vec3 &_a, const glm::vec3 &_b, const GLushort &_pattern = 0x00FF){
+    glm::vec3 linePoints[2];
+    linePoints[0] = _a;
+    linePoints[1] = _b;
+    
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, _pattern);
+    glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glDrawArrays(GL_LINES, 0, 2);
+    glDisable(GL_LINE_STIPPLE);
+};
+
 bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_line1End,
                              const glm::vec3 &_line2Start, const glm::vec3 &_line2End,
                              glm::vec3 &_intersection ){
