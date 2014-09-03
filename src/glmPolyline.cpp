@@ -421,7 +421,7 @@ void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
     }
 }
 
-glmPolyline glmPolyline::getUnProjected(){
+glmPolyline glmPolyline::getProjected(){
     
     glm::ivec4 viewport;
     glm::mat4x4 mvmatrix, projmatrix;

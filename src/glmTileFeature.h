@@ -24,9 +24,6 @@ public:
     virtual ~glmTileFeature(){};
     
     glmMesh         geometry;
-    glmPolyline     polyline;
-    glmText         text;
-    
     std::string     idString;
     
 private:
@@ -34,3 +31,29 @@ private:
 };
 
 typedef std::tr1::shared_ptr<glmTileFeature> glmTileFeatureRef;
+
+class glmLabeledFeature : public glmTileFeature{
+public:
+    
+    glmLabeledFeature():
+    type(LABEL_LINE){
+    };
+    virtual ~glmLabeledFeature(){};
+    
+    void updateProjection();
+    void draw();
+    
+    glmPolyline     polyline;
+    glmPolyline     projectedPolyline;
+    
+    glm::vec3       centroid;
+    glm::vec3       projectedCentroid;
+    
+    glmText         text;
+    LabelType       type;
+
+private:
+    
+};
+
+typedef std::tr1::shared_ptr<glmLabeledFeature> glmLabeledFeatureRef;

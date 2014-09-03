@@ -32,7 +32,7 @@ public:
     
     void draw();
 
-    std::vector<glmTileFeatureRef> labelFeatures;
+    std::vector<glmLabeledFeatureRef> labelFeatures;
     
     std::vector<glmTileFeatureRef> buildings;
     std::vector<glmTileFeatureRef> roads;
@@ -44,7 +44,9 @@ public:
 private:
 
     void buildLayerGeometry(std::string layerName, std::vector<glmTileFeatureRef> &_mesh, float minHeight = 0.);
+    
     void lineJson2Mesh(Json::Value &lineJson, glmMesh &_mesh, float minHeight);
+    void lineJson2Polyline(Json::Value &lineJson, glmPolyline &_poly, float minHeight);
     void polygonJson2Mesh(Json::Value &polygonJson, glmMesh &_mesh, float minHeight, float height);
     
     Json::Value m_jsonRoot;

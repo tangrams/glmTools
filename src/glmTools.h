@@ -69,27 +69,6 @@ double x2lon(double x) { return glm::degrees(x / R_EARTH); }
 double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + glm::radians(lat) / 2)); }
 double lon2x(double lon) { return glm::radians(lon) * R_EARTH; }
 
-glm::vec3 worldToScreen(const glm::vec3 &_worldPos){
-    glm::ivec4 viewport;
-    glm::mat4x4 mvmatrix, projmatrix;
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
-    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
-    
-    return glm::project(_worldPos, mvmatrix, projmatrix, viewport);
-}
-
-glm::vec3 screenToWorld(const glm::vec3 &_screenPos){
-    glm::ivec4 viewport;
-    glm::mat4x4 mvmatrix, projmatrix;
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
-    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
-    
-    return glm::unProject(_screenPos, mvmatrix, projmatrix, viewport);
-}
-
-
 float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false) {
 	if (fabs(inputMin - inputMax) < FLT_EPSILON){
 		return outputMin;
@@ -132,14 +111,17 @@ glm::vec3 getCentroid(std::vector<glm::vec3> &_pts){
 }
 
 void drawCross(const glm::vec3 &_pos, const float &_width = 3.5){
-    glm::vec3 linePoints[4] = {_pos, _pos, _pos, _pos};
+    glm::ivec3 linePoints[4] = {    glm::ivec3(_pos.x,_pos.y,_pos.z),
+                                    glm::ivec3(_pos.x,_pos.y,_pos.z),
+                                    glm::ivec3(_pos.x,_pos.y,_pos.z),
+                                    glm::ivec3(_pos.x,_pos.y,_pos.z) };
     linePoints[0].x -= _width;
     linePoints[1].x += _width;
     linePoints[2].y -= _width;
     linePoints[3].y += _width;
     
     glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glVertexPointer(2, GL_INT, sizeof(glm::ivec3), &linePoints[0].x);
 	glDrawArrays(GL_LINES, 0, 4);
 }
 
