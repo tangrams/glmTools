@@ -30,17 +30,12 @@ public:
     bool load(int _tileX, int _tileY, int _zoom);
     void unload();
     
-    void draw();
-
+    void build(std::string layerName, float _layerHeight = 0.);
+    
+    std::map< std::string, std::vector<glmTileFeatureRef> > layers;
+    
     std::vector<glmLabeledFeatureRef> labelFeatures;
     
-    std::vector<glmTileFeatureRef> buildings;
-    std::vector<glmTileFeatureRef> roads;
-    std::vector<glmTileFeatureRef> earth;
-    std::vector<glmTileFeatureRef> water;
-    std::vector<glmTileFeatureRef> pois;
-    std::vector<glmTileFeatureRef> places;
-
 private:
 
     void buildLayerGeometry(std::string layerName, std::vector<glmTileFeatureRef> &_mesh, float minHeight = 0.);

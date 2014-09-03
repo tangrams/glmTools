@@ -8,8 +8,6 @@
 
 #include "glmText.h"
 
-using namespace glm;
-
 void glmText::set(FTFont *_font, std::string _text){
     
     font = _font;
@@ -43,6 +41,15 @@ void glmText::set(FTFont *_font, std::string _text){
 
 glmRectangle glmText::getBoundingBox(){
     return bBox;
+}
+
+void glmText::drawOnRectangle(const glmRectangle &_rectangle){
+    glPushMatrix();
+    glm::vec3 anchorpoint = _rectangle.getBottomLeft();
+    glTranslatef(anchorpoint.x, anchorpoint.y, anchorpoint.z);
+    glScaled(1, -1, 1);
+    font->Render( &content[0], -1);
+    glPopMatrix();
 }
 
 void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double _hOffsetPct, bool _twoD ){
@@ -128,3 +135,50 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
         // TODO: what happen if don't fit ??
     }
 };
+
+void glmText::drawOnPosition(const glm::vec3 &_pos, const float &_margin, const double &_angle ){
+    glmRectangle label = bBox;
+    
+    label.x = _pos.x + _margin * cos(_angle);
+    label.y = _pos.y + _margin * sin(-_angle);
+    
+    if (_angle <= QUARTER_PI && _angle >= -QUARTER_PI){
+        //  EAST
+        //
+        label.x += 0.0;
+        label.y += mapValue(_angle,
+                            QUARTER_PI,     -QUARTER_PI,
+                            -label.height,  0);
+        
+    } else if (_angle >= QUARTER_PI && _angle <= QUARTER_PI*3.){
+        //  NORTH
+        //
+        label.x += mapValue(_angle,
+                            QUARTER_PI*3.,  QUARTER_PI,
+                            -label.width,   0);
+        label.y += -label.height;
+    } else if (_angle <= -QUARTER_PI && _angle >= -QUARTER_PI*3.){
+        //  SOUTH
+        //
+        label.x += mapValue(_angle,
+                            -QUARTER_PI*3., -QUARTER_PI,
+                            -label.width,   0);
+        label.y += 0.0;
+    } else if (_angle > QUARTER_PI*3. || _angle < -QUARTER_PI*3. ){
+        //  WEST
+        //
+        label.x -= label.width;
+        
+        if(_angle > 0){
+            label.y += mapValue(_angle,
+                                QUARTER_PI*3., PI,
+                                -label.height, -label.height*0.5);
+        } else {
+            label.y += mapValue(_angle,
+                                -PI, -QUARTER_PI*3.,
+                                -label.height*0.5,0.0);
+        }
+    }
+    
+    drawOnRectangle(label);
+}

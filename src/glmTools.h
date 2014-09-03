@@ -36,6 +36,10 @@
 #define HALF_PI  1.57079632679489661923
 #endif
 
+#ifndef QUARTER_PI
+#define QUARTER_PI 0.785398163
+#endif
+
 #ifndef R_EARTH
 #define R_EARTH 6378137
 #endif
@@ -86,6 +90,11 @@ float mapValue(float value, float inputMin, float inputMax, float outputMin, flo
 		}
 		return outVal;
 	}
+}
+
+void wrapRad(double &_angle){
+    if (_angle < -PI) _angle += PI*2.;
+    if (_angle > PI) _angle -= PI*2.;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {

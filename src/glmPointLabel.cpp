@@ -8,10 +8,6 @@
 
 #include "glmPointLabel.h"
 
-#include "glmPointLabel.h"
-
-#define QUARTER_PI 0.785398163
-
 glmPointLabel::glmPointLabel(float _x, float _y, float _text_width){
     x = _x;
     y = _y;
@@ -42,9 +38,7 @@ bool glmPointLabel::compute(glmPointLabel &_other){
             if (a > PI) a -= PI*2.;
             
             angle += a*0.01;
-            
-            if (angle < -PI) angle += PI*2.;
-            if (angle > PI) angle -= PI*2.;
+            wrapRad(angle);
             
             return true;
         } else if(label.intersects(_other.label)){
@@ -54,14 +48,10 @@ bool glmPointLabel::compute(glmPointLabel &_other){
             if (a > PI) a -= PI*2.;
             
             angle += a*0.01;
-            
-            if (angle < -PI) angle += PI*2.;
-            if (angle > PI) angle -= PI*2.;
+            wrapRad(angle);
             
             _other.angle -= a*0.01;
-            
-            if (_other.angle < -PI) _other.angle += PI*2.;
-            if (_other.angle > PI) _other.angle -= PI*2.;
+            wrapRad(_other.angle);
             
             return true;
         } else {

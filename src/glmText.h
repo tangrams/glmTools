@@ -28,10 +28,9 @@ public:
     
     glmRectangle getBoundingBox();
     
+    void drawOnRectangle(const glmRectangle &_rectangle);
+    void drawOnPosition(const glm::vec3 &_pos, const float &_margin = 5.0 ,const double &_angle = QUARTER_PI );
     void drawOnLine(const glmPolyline &_polyline, double _tryOffsetPct = 0., double _hOffsetPct = 0., bool _twoD = true);
-    void drawOnRectangle(const glmRectangle &_rectangle){
-        
-    }
     
 private:
     FTFont *font;

@@ -49,29 +49,23 @@ bool glmTile::load(std::string _filename){
     Json::Reader jsonReader;
     bool rta = jsonReader.parse(inputStream, m_jsonRoot);
     
-    buildings.clear();
-    buildLayerGeometry("buildings", buildings);
-    
-    earth.clear();
-    buildLayerGeometry("earth", earth);
-    
-    water.clear();
-    buildLayerGeometry("water", water);
-    
-    roads.clear();
-    buildLayerGeometry("roads", roads, 1.0);
-    
-    places.clear();
-    buildLayerGeometry("places", places, 2.0);
-    
-    pois.clear();
-    buildLayerGeometry("pois", pois, 3.0);
+    build("buildings");
+    build("earth");
+    build("landuse",1.0);
+    build("water");
+    build("roads",3.0);
+    build("places",2.0);
+    build("pois",4.0);
     
     return rta;
 }
 
 void glmTile::unload() {
     m_jsonRoot.clear();
+}
+
+void glmTile::build(std::string _layerName, float _layerHeight ){
+    buildLayerGeometry( _layerName, layers[_layerName], _layerHeight );
 }
 
 void glmTile::setGeometryOffset(glm::vec3 _offset){
@@ -92,14 +86,14 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
         
         std::string geometryType = geometryJson["type"].asString();
         
-        float height  = 0.0f;
+        float height = _minHeight;
         if (propsJson.isMember("height")) {
-            height = propsJson["height"].asFloat();
+            height += propsJson["height"].asFloat();
         }
         
-        float minHeight = 0.0f;
+        float minHeight = _minHeight;
         if (propsJson.isMember("min_height")) {
-            minHeight = propsJson["min_height"].asFloat();
+            minHeight += propsJson["min_height"].asFloat();
         }
         
         if (geometryType.compare("Point") == 0) {
@@ -118,7 +112,7 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
                 
                 glmLabeledFeatureRef labelRef(new glmLabeledFeature);
                 
-                lineJson2Polyline(geometryJson["coordinates"],labelRef->polyline,_minHeight);
+                lineJson2Polyline(geometryJson["coordinates"],labelRef->polyline,minHeight);
 
                 labelRef->centroid = labelRef->polyline.getBoundingBox().getCenter();
                 labelRef->text.set(font, propsJson["name"].asString());
@@ -131,7 +125,7 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
                 
             } else {
                 glmTileFeatureRef feature(new glmLabeledFeature);
-                lineJson2Mesh(geometryJson["coordinates"], feature->geometry, _minHeight);
+                lineJson2Mesh(geometryJson["coordinates"], feature->geometry, minHeight);
                 _features.push_back(feature);
             }
             
@@ -139,7 +133,7 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
                 glmTileFeatureRef feature(new glmTileFeature);
-                lineJson2Mesh(geometryJson["coordinates"][j], feature->geometry, _minHeight);
+                lineJson2Mesh(geometryJson["coordinates"][j], feature->geometry, minHeight);
                 _features.push_back(feature);
             }
             
@@ -156,11 +150,11 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
                 
                 labelFeatures.push_back(labelRef);
                 
-                polygonJson2Mesh(geometryJson["coordinates"], labelRef->geometry, _minHeight + minHeight, height);
+                polygonJson2Mesh(geometryJson["coordinates"], labelRef->geometry, minHeight, height);
                 _features.push_back(labelRef);
             } else {
                 glmTileFeatureRef feature(new glmTileFeature);
-                polygonJson2Mesh(geometryJson["coordinates"], feature->geometry, _minHeight + minHeight, height);
+                polygonJson2Mesh(geometryJson["coordinates"], feature->geometry, minHeight, height);
                 _features.push_back(feature);
             }
             
@@ -168,7 +162,7 @@ void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatu
             
             for (int j = 0; j < geometryJson["coordinates"].size(); j++) {
                 glmTileFeatureRef feature(new glmTileFeature);
-                polygonJson2Mesh(geometryJson["coordinates"][j], feature->geometry, _minHeight + minHeight, height);
+                polygonJson2Mesh(geometryJson["coordinates"][j], feature->geometry, minHeight, height);
                 _features.push_back(feature);
             }
             
@@ -282,27 +276,4 @@ void glmTile::lineJson2Polyline(Json::Value &lineJson, glmPolyline &_poly, float
                             lat2y(lineJson[i][1].asFloat()),
                             _minHeight) - m_geometryOffset);
     }
-}
-
-void glmTile::draw(){
-    for (int i = 0; i < earth.size(); i++) {
-        glColor3f(0.0,0.9,0.0);
-        earth[i]->geometry.draw();
-    }
-    
-    for (int i = 0; i < water.size(); i++) {
-        glColor3f(0.,0.,0.9);
-        water[i]->geometry.draw();
-    }
-
-    for (int i = 0; i < roads.size(); i++) {
-        glColor3f(0.1,0.1,0.1);
-        roads[i]->geometry.draw();
-    }
-
-    for (int i = 0; i < buildings.size(); i++) {
-        glColor3f(0.9,0.9,0.5);
-        buildings[i]->geometry.draw();
-    }
-    
 }
