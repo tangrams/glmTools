@@ -30,6 +30,8 @@ public:
     bool load(int _tileX, int _tileY, int _zoom);
     bool load(Json::Value &_jsonRoot);
     
+    void draw();
+    
     std::map< std::string, std::vector<glmTileFeatureRef> > layers;
     std::vector<glmLabeledFeatureRef> labelFeatures;
     
