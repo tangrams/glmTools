@@ -11,6 +11,41 @@
 #include <fstream>
 #include <utility>
 
+#include "tesselator.h"
+
+#include <curl/curl.h>
+#include <iostream>
+#include <sstream>
+
+//write_data call back from CURLOPT_WRITEFUNCTION
+//responsible to read and fill "stream" with the data.
+size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
+    std::string data((const char*) ptr, (size_t) size*nmemb);
+    *((std::stringstream*) stream) << data;
+    return size*nmemb;
+}
+
+std::string getURL(const std::string& url) {
+    CURL * curl = curl_easy_init();
+    
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    /* example.com is redirected, so we tell libcurl to follow redirection */
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1); //Prevent "longjmp causes uninitialized stack frame" bug
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "deflate");
+    std::stringstream out;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &out);
+    /* Perform the request, res will get the return code */
+    CURLcode res = curl_easy_perform(curl);
+    /* Check for errors */
+    if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                curl_easy_strerror(res));
+    }
+    return out.str();
+}
+
 glmTile::glmTile() {
     m_geometryOffset = glm::vec3(0,0,0);
     font = NULL;
@@ -38,6 +73,18 @@ bool glmTile::load(int _tileX, int _tileY, int _zoom){
     
     //  TODO: get JSON file from the web
     //
+    
+    std::ostringstream strStream;
+    strStream<<"http://vector.mapzen.com/osm/all/"<<_zoom<<"/"<<_tileX<<"/"<<_tileY<<".json";
+    
+    std::string tmp = getURL(strStream.str());
+    
+    std::tr1::shared_ptr<Json::Value> jsonVal(new Json::Value);
+    
+    int length = tmp.size();
+    Json::Reader jsonReader;
+    jsonReader.parse(tmp.c_str(), tmp.c_str() + length, *(jsonVal.get()));
+    load(*(jsonVal.get()));
 }
 
 bool glmTile::load(std::string _filename){
@@ -55,12 +102,14 @@ bool glmTile::load(std::string _filename){
 
 bool glmTile::load(Json::Value &_jsonRoot){
     buildLayer(_jsonRoot, "earth");
-    buildLayer(_jsonRoot, "water");
-    buildLayer(_jsonRoot, "buildings");
     buildLayer(_jsonRoot, "landuse",1.0);
-    buildLayer(_jsonRoot, "places",2.0);
-    buildLayer(_jsonRoot, "roads",3.0);
-    buildLayer(_jsonRoot, "pois",4.0);
+    
+    buildLayer(_jsonRoot, "water",2.);
+    buildLayer(_jsonRoot, "buildings",3.0);
+    
+    buildLayer(_jsonRoot, "places",4.0);
+    buildLayer(_jsonRoot, "roads",5.0);
+    buildLayer(_jsonRoot, "pois",6.0);
 }
 
 void glmTile::setGeometryOffset(glm::vec3 _offset){

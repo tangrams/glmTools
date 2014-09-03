@@ -14,7 +14,6 @@
 #include "glmTileFeature.h"
 #include "glmPolyline.h"
 
-#include "tesselator.h"
 #include "ftgl.h"
 
 class glmTile {
