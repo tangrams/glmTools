@@ -47,34 +47,33 @@ bool glmTile::load(std::string _filename){
 	}
     
     Json::Reader jsonReader;
+    Json::Value m_jsonRoot;
     bool rta = jsonReader.parse(inputStream, m_jsonRoot);
-    
-    build("buildings");
-    build("earth");
-    build("landuse",1.0);
-    build("water");
-    build("roads",3.0);
-    build("places",2.0);
-    build("pois",4.0);
-    
+    load(m_jsonRoot);
     return rta;
 }
 
-void glmTile::unload() {
-    m_jsonRoot.clear();
-}
-
-void glmTile::build(std::string _layerName, float _layerHeight ){
-    buildLayerGeometry( _layerName, layers[_layerName], _layerHeight );
+bool glmTile::load(Json::Value &_jsonRoot){
+    buildLayer(_jsonRoot, "earth");
+    buildLayer(_jsonRoot, "water");
+    buildLayer(_jsonRoot, "buildings");
+    buildLayer(_jsonRoot, "landuse",1.0);
+    buildLayer(_jsonRoot, "places",2.0);
+    buildLayer(_jsonRoot, "roads",3.0);
+    buildLayer(_jsonRoot, "pois",4.0);
 }
 
 void glmTile::setGeometryOffset(glm::vec3 _offset){
     m_geometryOffset = _offset;
 }
 
-void glmTile::buildLayerGeometry(std::string layerName, std::vector<glmTileFeatureRef> &_features, float _minHeight) {
+void glmTile::buildLayer(Json::Value &_jsonRoot, std::string _layerName, float _layerHeight ){
+    buildGeometry(_jsonRoot, _layerName, layers[_layerName], _layerHeight );
+}
+
+void glmTile::buildGeometry(Json::Value &_jsonRoot, std::string layerName, std::vector<glmTileFeatureRef> &_features, float _minHeight) {
     
-    Json::Value featureListJson = m_jsonRoot[layerName.c_str()]["features"];
+    Json::Value featureListJson = _jsonRoot[layerName.c_str()]["features"];
     
     std::vector<glm::vec3> verts;
     std::vector<uint16_t> inds;
