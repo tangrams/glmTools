@@ -262,13 +262,17 @@ std::vector<glm::vec3> & glmPolyline::getVertices(){
 }
 
 void glmPolyline::draw(){
-    glEnable(GL_LINE_STIPPLE);
-    glLineStipple(1, 0x1111);
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {
         glVertex2d(cartesians[i].x,cartesians[i].y);
     }
     glEnd();
+}
+
+void glmPolyline::drawStipple(GLushort _pattern){
+    glEnable(GL_LINE_STIPPLE);
+    glLineStipple(1, _pattern);
+    draw();
     glDisable(GL_LINE_STIPPLE);
 }
 

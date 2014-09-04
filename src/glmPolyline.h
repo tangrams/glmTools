@@ -16,7 +16,6 @@ struct glmPolarPoint {
         
         //  TODO: pass this to 3D
         //
-        
         glm::vec3 diff = _dst - _org;
         a = atan2(diff.y,diff.x);
         r = glm::length(glm::vec2(diff.x,diff.y));
@@ -57,6 +56,7 @@ public:
     void    simplify(float tolerance=0.3f);
     
     void    draw();
+    void    drawStipple(GLushort _pattern = 0x1111);
     void    drawPoints();
     void    drawNormals();
 

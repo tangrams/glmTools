@@ -30,9 +30,6 @@ public:
     bool    intersects(const glmRectangle& _rect) const;
     bool    intersects(const glm::vec3& _p0, const glm::vec3& _p1) const;
     
-    glm::vec3    getMin() const;
-    glm::vec3    getMax() const;
-    
     float   getMinX() const;
     float   getMaxX() const;
     float   getMinY() const;
@@ -43,15 +40,17 @@ public:
     float   getTop()    const;
     float   getBottom() const;
     
+    glm::vec3    getMin() const;
+    glm::vec3    getMax() const;
+    
     glm::vec3   getCenter() const;
+    glm::vec3   getTopLeft() const;
+    glm::vec3   getTopRight() const;
+    glm::vec3   getBottomLeft() const;
+    glm::vec3   getBottomRight() const;
     
-    glm::vec3    getTopLeft() const;
-    glm::vec3    getTopRight() const;
-    glm::vec3    getBottomLeft() const;
-    glm::vec3    getBottomRight() const;
-    
-    void drawBorders();
-    void drawCorners(const float &_width = 3.);
+    void    drawBorders();
+    void    drawCorners(const float &_width = 3.);
     
     float   x,y,width,height;
 };

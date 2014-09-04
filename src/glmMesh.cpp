@@ -15,6 +15,13 @@ void glmMesh::setDrawMode(GLenum _drawMode){
     drawMode = _drawMode;
 }
 
+void glmMesh::setColor(const glm::vec4 &_color){
+    colors.clear();
+    for (int i = 0; i < vertices.size(); i++) {
+        colors.push_back(_color);
+    }
+}
+
 void glmMesh::addColor(const glm::vec4 &_color){
     colors.push_back(_color);
 }

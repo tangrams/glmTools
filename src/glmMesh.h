@@ -15,6 +15,7 @@ public:
     glmMesh();
     
     void    setDrawMode(GLenum _drawMode);
+    void    setColor(const glm::vec4 &_color);
     
     void    addColor(const glm::vec4 &_color);
     
@@ -32,9 +33,9 @@ public:
     
     void    addTriangle(uint16_t index1, uint16_t index2, uint16_t index3);
     
-    std::vector<glm::vec3> &getVertices();
-    std::vector<glm::vec3> &getNormals();
-    std::vector<uint16_t> &getIndices();
+    std::vector<glm::vec3>  &getVertices();
+    std::vector<glm::vec3>  &getNormals();
+    std::vector<uint16_t>   &getIndices();
     
     void    clear();
     void    draw();
@@ -44,7 +45,7 @@ private:
     std::vector<glm::vec3>  vertices;
     std::vector<glm::vec3>  normals;
     std::vector<glm::vec2>  texCoords;
-    std::vector<uint16_t> indices;
+    std::vector<uint16_t>   indices;
     
     GLenum  drawMode;
 };
