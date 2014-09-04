@@ -1,6 +1,5 @@
 //
 //  glmMesh.cpp
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 8/22/14.
 //

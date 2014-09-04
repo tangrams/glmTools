@@ -1,6 +1,5 @@
 //
 //  glmLables.cpp
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 8/22/14.
 //
@@ -8,35 +7,53 @@
 
 #include "glmText.h"
 
-void glmText::set(FTFont *_font, std::string _text){
+glmText::glmText():
+font(NULL)
+{
     
+}
+
+glmText::~glmText(){
+    
+}
+
+void glmText::setFont(FTFont *_font){
     font = _font;
-    
-    content = _text;
-    letters_width.clear();
-    words_width.clear();
-    
-    std::string word = "";
-    double word_width = 0;
-    
-    for(int i = 0; i < _text.size(); i++){
-        FTBBox bbox = _font->BBox( &_text[i], 1);
+    updateCache();
+}
+
+void glmText::setText(const std::string &_text){
+    text = _text;
+    updateCache();
+}
+
+void glmText::updateCache(){
+    if(font!=NULL){
+        letters_width.clear();
+        words_width.clear();
         
-        if( _text[i] == ' '){
-            letters_width.push_back(_font->BBox( "A", 1).Upper().Xf());
-            words_width.push_back(word_width);
-            word_width = 0.;
-            word = "";
-        } else {
-            float char_width = bbox.Upper().Xf();
-            letters_width.push_back(char_width);
-            word_width += char_width;
-            word += &_text[i];
+        std::string word = "";
+        double word_width = 0;
+        
+        for(int i = 0; i < text.size(); i++){
+            FTBBox bbox = font->BBox( &text[i], 1);
+            
+            if( text[i] == ' '){
+                letters_width.push_back(font->BBox( "A", 1).Upper().Xf());
+                words_width.push_back(word_width);
+                word_width = 0.;
+                word = "";
+            } else {
+                float char_width = bbox.Upper().Xf();
+                letters_width.push_back(char_width);
+                word_width += char_width;
+                word += &text[i];
+            }
         }
+        
+        FTBBox box = font->BBox(text.c_str(), -1, FTPoint());
+        bBox.set(box.Lower().Xf(), box.Lower().Yf(), box.Upper().Xf(), box.Upper().Yf());
     }
-    
-    FTBBox box = font->BBox(content.c_str(), -1, FTPoint());
-    bBox.set(box.Lower().Xf(), box.Lower().Yf(), box.Upper().Xf(), box.Upper().Yf());
 }
 
 glmRectangle glmText::getBoundingBox(){
@@ -48,7 +65,7 @@ void glmText::drawOnRectangle(const glmRectangle &_rectangle){
     glm::vec3 anchorpoint = _rectangle.getBottomLeft();
     glTranslatef(anchorpoint.x, anchorpoint.y, anchorpoint.z);
     glScaled(1, -1, 1);
-    font->Render( &content[0], -1);
+    font->Render( &text[0], -1);
     glPopMatrix();
 }
 
@@ -84,7 +101,7 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
         }
         
         if(angle < PI*0.5 && angle > -PI*0.5){
-            for (int i = content.length()-1; i >=0 ; i--) {
+            for (int i = text.length()-1; i >=0 ; i--) {
                 
                 glm::vec3 src = _polyline.getPositionAt(offset);
                 double rot = _polyline.getAngleAt(offset);
@@ -104,12 +121,12 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
                 glTranslated(-letters_width[i], 0, 0);
                 
                 glTranslatef(0., -bBox.height*_hOffsetPct,0.);
-                font->Render( &content[i] , 1);
+                font->Render( &text[i] , 1);
                 glPopMatrix();
                 offset += letters_width[i];
             }
         } else {
-            for (int i = 0; i < content.length(); i++) {
+            for (int i = 0; i < text.length(); i++) {
                 
                 glm::vec3 src = _polyline.getPositionAt(offset);
                 double rot = _polyline.getAngleAt(offset);
@@ -126,7 +143,7 @@ void glmText::drawOnLine(const glmPolyline &_polyline, double _offsetPct, double
                 }
                 
                 glTranslatef(0., -bBox.height*_hOffsetPct,0.);
-                font->Render( &content[i] , 1);
+                font->Render( &text[i] , 1);
                 glPopMatrix();
                 offset += letters_width[i];
             }

@@ -1,6 +1,5 @@
 //
 //  LineLables.h
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 8/22/14.
 //
@@ -23,8 +22,11 @@ enum LabelType {
 class glmText{
 public:
     
-    glmText(){};
-    void set(FTFont *_font, std::string _text);
+    glmText();
+    virtual ~glmText();
+    
+    void setFont(FTFont *_font);
+    void setText(const std::string &_text);
     
     glmRectangle getBoundingBox();
     
@@ -33,10 +35,14 @@ public:
     void drawOnLine(const glmPolyline &_polyline, double _tryOffsetPct = 0., double _hOffsetPct = 0., bool _twoD = true);
     
 private:
-    FTFont *font;
+    void updateCache();
+
+    std::vector<float> words_width;
+    std::vector<float> letters_width;
+    
+    std::string text;
+    
     glmRectangle bBox;
     
-    std::vector<float> letters_width;
-    std::vector<float> words_width;
-    std::string content;
+    FTFont *font;
 };

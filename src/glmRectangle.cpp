@@ -1,6 +1,5 @@
 //
 //  glmRectangle.cpp
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 8/27/14.
 //

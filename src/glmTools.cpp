@@ -1,6 +1,5 @@
 //
 //  glmTools.cpp
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 9/4/14.
 //
