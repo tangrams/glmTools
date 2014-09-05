@@ -36,6 +36,24 @@ void wrapRad(double &_angle){
     if (_angle > PI) _angle -= PI*2.;
 }
 
+std::string toString(const int &_int){
+    std::ostringstream strStream;
+    strStream<<_int;
+    return strStream.str();
+}
+
+std::string toString(const float &_float){
+    std::ostringstream strStream;
+    strStream<<_float;
+    return strStream.str();
+}
+
+std::string toString(const double &_double){
+    std::ostringstream strStream;
+    strStream<<_double;
+    return strStream.str();
+}
+
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {
 	os << vec.x << ", " << vec.y << ", " << vec.z;
 	return os;

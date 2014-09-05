@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 #include <OpenGL/gl.h>
 
@@ -73,9 +74,12 @@ double x2lon(double x);
 double lat2y(double lat);
 double lon2x(double lon);
 
+void wrapRad(double &_angle);
 float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false);
 
-void wrapRad(double &_angle);
+std::string toString(const int &_float);
+std::string toString(const float &_float);
+std::string toString(const double &_float);
 
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
 
