@@ -54,6 +54,12 @@ std::string toString(const double &_double){
     return strStream.str();
 }
 
+std::string toString(const char &_char){
+    std::stringstream strStream;
+    strStream<<_char;
+    return strStream.str();
+}
+
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {
 	os << vec.x << ", " << vec.y << ", " << vec.z;
 	return os;
