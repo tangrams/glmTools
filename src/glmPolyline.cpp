@@ -11,24 +11,15 @@
 #include "tesselator.h"
 
 int glmPolyline::size() const {
-    return cartesians.size();
+    return points.size();
 }
 
 void glmPolyline::clear(){
-    cartesians.clear();
-    polars.clear();
-    
-    distances.clear();
+    points.clear();
 }
 
 void glmPolyline::add( const glm::vec3 & _point ){
-    if(size()>0){
-        polars.push_back( glmPolarPoint(cartesians[cartesians.size()-1],_point) );
-        distances.push_back( distances[distances.size()-1] + polars[polars.size()-1].r );
-    } else {
-        distances.push_back(0.0);
-    }
-    cartesians.push_back(_point);
+    points.push_back(_point);
 }
 
 void glmPolyline::add(const std::vector<glm::vec3> & _points){
@@ -51,63 +42,11 @@ void glmPolyline::addVertices(const glm::vec3* verts, int numverts) {
 }
 
 glm::vec3& glmPolyline::operator [](const int &_index){
-    return cartesians[_index];
+    return points[_index];
 }
 
 glm::vec3 glmPolyline::operator [](const int &_index) const {
-    return cartesians[_index];
-}
-
-float glmPolyline::getAngleAt(const float &_dist) const{
-    
-    if(polars.size() == 0 || distances.size() == 0){
-        return -1;
-    } else if(_dist <= 0){
-        return polars[0].a;
-    }
-    
-    for (int i = 1; i < distances.size(); i++) {
-        if(_dist<=distances[i]){
-            return polars[i-1].a;
-        }
-    }
-    
-    return 0;
-}
-
-glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
-    
-    //  TODO: This can be done better maybe with some C++11 magic!
-    //
-    
-    if (size()==2) {
-        return cartesians[0] + glm::vec3(_dist*cos(polars[0].a),
-                                         _dist*sin(polars[0].a),
-                                         0.0f);
-        
-    }
-    
-    for (int i = 1; i < distances.size(); i++) {
-        if(_dist<=distances[i]){
-            float diff = _dist-distances[i];
-            return glm::vec3(cartesians[i].x + diff*cos(polars[i-1].a),
-                             cartesians[i].y + diff*sin(polars[i-1].a),
-                             0.0f);
-        }
-    }
-    
-    return cartesians[size()-1];
-}
-
-float glmPolyline::getFractAt(float _dist,float _offset)const{
-    float a = getAngleAt(_dist-_offset);
-    float b = getAngleAt(_dist+_offset);
-    
-    float diff= (a - b);
-    if (diff < -PI) diff += PI*2.;
-    if (diff > PI) diff -= PI*2.;
-    
-    return abs(diff)/PI;
+    return points[_index];
 }
 
 //This is for polygon/contour simplification - we use it to reduce the number of points needed in
@@ -182,7 +121,7 @@ static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
 }
 
 void glmPolyline::simplify(float tol){
-    if(cartesians.size() < 2) return;
+    if(points.size() < 2) return;
     
 	int n = size();
 	
@@ -202,14 +141,14 @@ void glmPolyline::simplify(float tol){
     
     
     // STAGE 1.  Vertex Reduction within tolerance of prior vertex cluster
-    vt[0] = cartesians[0];              // start at the beginning
+    vt[0] = points[0];              // start at the beginning
     for (i=k=1, pv=0; i<n; i++) {
-        if (d2(cartesians[i], cartesians[pv]) < tol2) continue;
+        if (d2(points[i], points[pv]) < tol2) continue;
         
-        vt[k++] = cartesians[i];
+        vt[k++] = points[i];
         pv = i;
     }
-    if (pv < n-1) vt[k++] = cartesians[n-1];      // finish at the end
+    if (pv < n-1) vt[k++] = points[n-1];      // finish at the end
     
     // STAGE 2.  Douglas-Peucker polyline simplification
     mk[0] = mk[k-1] = 1;       // mark the first and last vertices
@@ -222,49 +161,22 @@ void glmPolyline::simplify(float tol){
     
 	//get rid of the unused points
 	if( m < (int)sV.size() ){
-		cartesians.assign( sV.begin(),sV.begin()+m );
+		points.assign( sV.begin(),sV.begin()+m );
 	}else{
-		cartesians = sV;
+		points = sV;
 	}
     
     updateCache();
 }
 
-void glmPolyline::updateCache(){
-    polars.clear();
-    distances.clear();
-    
-    float total = 0;
-    for (int i = 1; i < size(); i++) {
-        glmPolarPoint p = glmPolarPoint(cartesians[i-1],cartesians[i]);
-        polars.push_back(p);
-        distances.push_back( total );
-        total += p.r;
-    }
-    distances.push_back( total );
-}
-
-float glmPolyline::getLength(const int &_index) const {
-    
-    if(_index >= size() || size() == 0){
-        return -1;
-    } else if(_index == -1){
-        return distances[size()-1];
-    } else if ( _index < 0){
-        return 0;
-    } else {
-        return distances[_index];
-    }
-}
-
 std::vector<glm::vec3> & glmPolyline::getVertices(){
-	return cartesians;
+	return points;
 }
 
 void glmPolyline::draw(){
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {
-        glVertex2d(cartesians[i].x,cartesians[i].y);
+        glVertex2d(points[i].x,points[i].y);
     }
     glEnd();
 }
@@ -280,22 +192,10 @@ void glmPolyline::drawPoints(){
     glPointSize(3);
     glBegin(GL_POINTS);
     for (int i = 0; i < size(); i++) {
-        glVertex2d(cartesians[i].x,cartesians[i].y);
+        glVertex2d(points[i].x,points[i].y);
     }
     glEnd();
     glPointSize(1);
-}
-
-void glmPolyline::drawNormals(){
-    for (int i = 0; i < size()-1; i++) {
-        float angle = polars[i].a-HALF_PI;
-        
-        glm::vec3 head;
-        head.x = polars[i].r * cos(angle);
-        head.y = polars[i].r * sin(angle);
-        head.z = 0.0f;
-        drawLine(cartesians[i],cartesians[i]+head);
-    }
 }
 
 //  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
@@ -310,8 +210,8 @@ void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width){
     glm::vec3 rightNorm;         // Right "normal" at current point, scaled for miter joint
     
     glm::vec3 im1;                   // Previous point coordinates
-    glm::vec3 i0 = cartesians[0];    // Current point coordinates
-    glm::vec3 ip1 = cartesians[1];   // Next point coordinates
+    glm::vec3 i0 = points[0];    // Current point coordinates
+    glm::vec3 ip1 = points[1];   // Next point coordinates
     
     normip1.x = ip1.y - i0.y;
     normip1.y = i0.x - ip1.x;
@@ -334,7 +234,7 @@ void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width){
     for (int i = 1; i < size() - 1; i++) {
         im1 = i0;
         i0 = ip1;
-        ip1 = cartesians[i+1];
+        ip1 = points[i+1];
         
         normi = normip1;
         normip1.x = ip1.y - i0.y;
@@ -376,9 +276,9 @@ void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
     glmRectangle bBox = getBoundingBox();
 
     _mesh.setDrawMode(GL_TRIANGLES);
-    for (int i = 0; i < cartesians.size(); i++) {
+    for (int i = 0; i < points.size(); i++) {
         // Add contour to tesselator
-        tessAddContour(m_tess, 3, &cartesians[0].x, sizeof(glm::vec3), cartesians.size());
+        tessAddContour(m_tess, 3, &points[0].x, sizeof(glm::vec3), points.size());
     }
     
     // Tessellate polygon into triangles
@@ -418,29 +318,9 @@ glmRectangle glmPolyline::getBoundingBox() const {
 void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
     for(size_t i = 0; i < size(); i++) {
         if(i == 0) {
-            _bbox.set(cartesians[i].x,cartesians[i].y,0.,0.);
+            _bbox.set(points[i].x,points[i].y,0.,0.);
         } else {
-            _bbox.growToInclude(cartesians[i]);
+            _bbox.growToInclude(points[i]);
         }
     }
-}
-
-glmPolyline glmPolyline::getProjected(){
-    
-    glm::ivec4 viewport;
-    glm::mat4x4 mvmatrix, projmatrix;
-    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
-    glGetFloatv(GL_MODELVIEW_MATRIX, &mvmatrix[0][0]);
-    glGetFloatv(GL_PROJECTION_MATRIX, &projmatrix[0][0]);
-    
-    glmPolyline unprojected;
-    for (int i = 0; i < size(); i++) {
-        glm::vec3 v = glm::project(cartesians[i], mvmatrix, projmatrix, viewport);
-        if( v.z >= 0.0 && v.z <= 1.0){
-            unprojected.add(v);
-        }
-    }
-	
-    return unprojected;
-    
 }
