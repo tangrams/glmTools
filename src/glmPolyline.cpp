@@ -11,15 +11,15 @@
 #include "tesselator.h"
 
 int glmPolyline::size() const {
-    return points.size();
+    return m_points.size();
 }
 
 void glmPolyline::clear(){
-    points.clear();
+    m_points.clear();
 }
 
 void glmPolyline::add( const glm::vec3 & _point ){
-    points.push_back(_point);
+    m_points.push_back(_point);
 }
 
 void glmPolyline::add(const std::vector<glm::vec3> & _points){
@@ -42,14 +42,14 @@ void glmPolyline::addVertices(const glm::vec3* verts, int numverts) {
 }
 
 glm::vec3& glmPolyline::operator [](const int &_index){
-    return points[_index];
+    return m_points[_index];
 }
 
 glm::vec3 glmPolyline::operator [](const int &_index) const {
-    return points[_index];
+    return m_points[_index];
 }
 
-//This is for polygon/contour simplification - we use it to reduce the number of points needed in
+//This is for polygon/contour simplification - we use it to reduce the number of m_points needed in
 //representing the letters as openGL shapes - will soon be moved to ofGraphics.cpp
 
 // From: http://softsurfer.com/Archive/algorithm_0205/algorithm_0205.htm
@@ -121,7 +121,7 @@ static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
 }
 
 void glmPolyline::simplify(float tol){
-    if(points.size() < 2) return;
+    if(m_points.size() < 2) return;
     
 	int n = size();
 	
@@ -141,14 +141,14 @@ void glmPolyline::simplify(float tol){
     
     
     // STAGE 1.  Vertex Reduction within tolerance of prior vertex cluster
-    vt[0] = points[0];              // start at the beginning
+    vt[0] = m_points[0];              // start at the beginning
     for (i=k=1, pv=0; i<n; i++) {
-        if (d2(points[i], points[pv]) < tol2) continue;
+        if (d2(m_points[i], m_points[pv]) < tol2) continue;
         
-        vt[k++] = points[i];
+        vt[k++] = m_points[i];
         pv = i;
     }
-    if (pv < n-1) vt[k++] = points[n-1];      // finish at the end
+    if (pv < n-1) vt[k++] = m_points[n-1];      // finish at the end
     
     // STAGE 2.  Douglas-Peucker polyline simplification
     mk[0] = mk[k-1] = 1;       // mark the first and last vertices
@@ -159,24 +159,24 @@ void glmPolyline::simplify(float tol){
         if (mk[i]) sV[m++] = vt[i];
     }
     
-	//get rid of the unused points
+	//get rid of the unused m_points
 	if( m < (int)sV.size() ){
-		points.assign( sV.begin(),sV.begin()+m );
+		m_points.assign( sV.begin(),sV.begin()+m );
 	}else{
-		points = sV;
+		m_points = sV;
 	}
     
     updateCache();
 }
 
 std::vector<glm::vec3> & glmPolyline::getVertices(){
-	return points;
+	return m_points;
 }
 
 void glmPolyline::draw(){
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {
-        glVertex2d(points[i].x,points[i].y);
+        glVertex2d(m_points[i].x,m_points[i].y);
     }
     glEnd();
 }
@@ -192,7 +192,7 @@ void glmPolyline::drawPoints(){
     glPointSize(3);
     glBegin(GL_POINTS);
     for (int i = 0; i < size(); i++) {
-        glVertex2d(points[i].x,points[i].y);
+        glVertex2d(m_points[i].x,m_points[i].y);
     }
     glEnd();
     glPointSize(1);
@@ -208,13 +208,13 @@ void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width, bool _TRIANGLE_S
     
     uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
     
-    glm::vec3 normi;             // Right normal to segment between previous and current points
-    glm::vec3 normip1;           // Right normal to segment between current and next points
+    glm::vec3 normi;             // Right normal to segment between previous and current m_points
+    glm::vec3 normip1;           // Right normal to segment between current and next m_points
     glm::vec3 rightNorm;         // Right "normal" at current point, scaled for miter joint
     
     glm::vec3 im1;                   // Previous point coordinates
-    glm::vec3 i0 = points[0];    // Current point coordinates
-    glm::vec3 ip1 = points[1];   // Next point coordinates
+    glm::vec3 i0 = m_points[0];    // Current point coordinates
+    glm::vec3 ip1 = m_points[1];   // Next point coordinates
     
     normip1.x = ip1.y - i0.y;
     normip1.y = i0.x - ip1.x;
@@ -232,12 +232,12 @@ void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width, bool _TRIANGLE_S
     _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
     _mesh.addTexCoord(glm::vec2(0.0,0.0));
     
-    // Loop over intermediate points in the polyline
+    // Loop over intermediate m_points in the polyline
     //
     for (int i = 1; i < size() - 1; i++) {
         im1 = i0;
         i0 = ip1;
-        ip1 = points[i+1];
+        ip1 = m_points[i+1];
         
         normi = normip1;
         normip1.x = ip1.y - i0.y;
@@ -292,9 +292,9 @@ void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
     glmRectangle bBox = getBoundingBox();
 
     _mesh.setDrawMode(GL_TRIANGLES);
-    for (int i = 0; i < points.size(); i++) {
+    for (int i = 0; i < m_points.size(); i++) {
         // Add contour to tesselator
-        tessAddContour(m_tess, 3, &points[0].x, sizeof(glm::vec3), points.size());
+        tessAddContour(m_tess, 3, &m_points[0].x, sizeof(glm::vec3), m_points.size());
     }
     
     // Tessellate polygon into triangles
@@ -334,9 +334,9 @@ glmRectangle glmPolyline::getBoundingBox() const {
 void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
     for(size_t i = 0; i < size(); i++) {
         if(i == 0) {
-            _bbox.set(points[i].x,points[i].y,0.,0.);
+            _bbox.set(m_points[i].x,m_points[i].y,0.,0.);
         } else {
-            _bbox.growToInclude(points[i]);
+            _bbox.growToInclude(m_points[i]);
         }
     }
 }

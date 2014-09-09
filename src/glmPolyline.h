@@ -45,5 +45,5 @@ public:
 protected:
     virtual void updateCache(){};
     
-    std::vector<glm::vec3>    points;
+    std::vector<glm::vec3>  m_points;
 };

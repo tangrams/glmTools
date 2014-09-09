@@ -43,6 +43,6 @@ protected:
     //  Cached data
     //
     void    updateCache();
-    std::vector<glmPolarPoint>  polars;
-    std::vector<float>         distances;
+    std::vector<glmPolarPoint>  m_polars;
+    std::vector<float>          m_distances;
 };

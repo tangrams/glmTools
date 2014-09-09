@@ -17,31 +17,31 @@ glmSmartLine::~glmSmartLine(){
 void glmSmartLine::clear(){
     glmPolyline::clear();
     
-    polars.clear();
-    distances.clear();
+    m_polars.clear();
+    m_distances.clear();
 }
 
 void glmSmartLine::add( const glm::vec3 & _point ){
     if(size()>0){
-        polars.push_back( glmPolarPoint(points[points.size()-1],_point) );
-        distances.push_back( distances[distances.size()-1] + polars[polars.size()-1].r );
+        m_polars.push_back( glmPolarPoint(m_points[m_points.size()-1],_point) );
+        m_distances.push_back( m_distances[m_distances.size()-1] + m_polars[m_polars.size()-1].r );
     } else {
-        distances.push_back(0.0);
+        m_distances.push_back(0.0);
     }
     glmPolyline::add(_point);
 }
 
 float glmSmartLine::getAngleAt(const float &_dist) const{
     
-    if(polars.size() == 0 || distances.size() == 0){
+    if(m_polars.size() == 0 || m_distances.size() == 0){
         return -1;
     } else if(_dist <= 0){
-        return polars[0].a;
+        return m_polars[0].a;
     }
     
-    for (int i = 1; i < distances.size(); i++) {
-        if(_dist<=distances[i]){
-            return polars[i-1].a;
+    for (int i = 1; i < m_distances.size(); i++) {
+        if(_dist<=m_distances[i]){
+            return m_polars[i-1].a;
         }
     }
     
@@ -51,22 +51,22 @@ float glmSmartLine::getAngleAt(const float &_dist) const{
 glm::vec3 glmSmartLine::getPositionAt(const float &_dist) const{
 
     if (size()==2) {
-        return points[0] + glm::vec3(_dist*cos(polars[0].a),
-                                         _dist*sin(polars[0].a),
-                                         0.0f);
+        return m_points[0] + glm::vec3(_dist*cos(m_polars[0].a),
+                                       _dist*sin(m_polars[0].a),
+                                       0.0f);
         
     }
     
-    for (int i = 1; i < distances.size(); i++) {
-        if(_dist<=distances[i]){
-            float diff = _dist-distances[i];
-            return glm::vec3(points[i].x + diff*cos(polars[i-1].a),
-                             points[i].y + diff*sin(polars[i-1].a),
+    for (int i = 1; i < m_distances.size(); i++) {
+        if(_dist<=m_distances[i]){
+            float diff = _dist-m_distances[i];
+            return glm::vec3(m_points[i].x + diff*cos(m_polars[i-1].a),
+                             m_points[i].y + diff*sin(m_polars[i-1].a),
                              0.0f);
         }
     }
     
-    return points[size()-1];
+    return m_points[size()-1];
 }
 
 float glmSmartLine::getFractAt(const float &_dist, const float &_offset) const{
@@ -81,17 +81,17 @@ float glmSmartLine::getFractAt(const float &_dist, const float &_offset) const{
 }
 
 void glmSmartLine::updateCache(){
-    polars.clear();
-    distances.clear();
+    m_polars.clear();
+    m_distances.clear();
     
     float total = 0;
     for (int i = 1; i < size(); i++) {
-        glmPolarPoint p = glmPolarPoint(points[i-1],points[i]);
-        polars.push_back(p);
-        distances.push_back( total );
+        glmPolarPoint p = glmPolarPoint(m_points[i-1],m_points[i]);
+        m_polars.push_back(p);
+        m_distances.push_back( total );
         total += p.r;
     }
-    distances.push_back( total );
+    m_distances.push_back( total );
 }
 
 float glmSmartLine::getLength(const int &_index) const {
@@ -99,22 +99,22 @@ float glmSmartLine::getLength(const int &_index) const {
     if(_index >= size() || size() == 0){
         return -1;
     } else if(_index == -1){
-        return distances[size()-1];
+        return m_distances[size()-1];
     } else if ( _index < 0){
         return 0;
     } else {
-        return distances[_index];
+        return m_distances[_index];
     }
 }
 
 void glmSmartLine::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
-        float angle = polars[i].a-HALF_PI;
+        float angle = m_polars[i].a-HALF_PI;
         
         glm::vec3 head;
-        head.x = polars[i].r * cos(angle);
-        head.y = polars[i].r * sin(angle);
+        head.x = m_polars[i].r * cos(angle);
+        head.y = m_polars[i].r * sin(angle);
         head.z = 0.0f;
-        drawLine(points[i],points[i]+head);
+        drawLine(m_points[i],m_points[i]+head);
     }
 }

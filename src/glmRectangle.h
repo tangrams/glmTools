@@ -40,8 +40,8 @@ public:
     float   getTop()    const;
     float   getBottom() const;
     
-    glm::vec3    getMin() const;
-    glm::vec3    getMax() const;
+    glm::vec3   getMin() const;
+    glm::vec3   getMax() const;
     
     glm::vec3   getCenter() const;
     glm::vec3   getTopLeft() const;
