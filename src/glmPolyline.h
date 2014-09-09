@@ -2,7 +2,7 @@
 //  glmPolyline.h
 //
 //  Created by Patricio Gonzalez Vivo on 8/20/14.
-//
+//  Inspired by: https://github.com/openframeworks/openFrameworks/blob/master/libs/openFrameworks/graphics/ofPolyline.h
 //
 
 #pragma once
@@ -30,7 +30,7 @@ public:
 	glmRectangle getBoundingBox() const;
     
     void    addToBoundingBox(glmRectangle &_bbox) const;
-    void    addAsLineToMesh(glmMesh &_mesh, float _width = 3.0);
+    void    addAsLineToMesh(glmMesh &_mesh, float _width = 3.0, bool _TRIANGLE_STRIP = true);
     void    addAsShapeToMesh(glmMesh &_mesh);
     
     int     size() const;

@@ -2,7 +2,7 @@
 //  glmMesh.h
 //
 //  Created by Patricio Gonzalez Vivo on 8/22/14.
-//
+//  Inspired by: https://github.com/openframeworks/openFrameworks/blob/master/libs/openFrameworks/3d/ofMesh.h
 //
 
 #pragma once
@@ -33,8 +33,10 @@ public:
     
     void    addTriangle(uint16_t index1, uint16_t index2, uint16_t index3);
     
+    std::vector<glm::vec4>  &getColors();
     std::vector<glm::vec3>  &getVertices();
     std::vector<glm::vec3>  &getNormals();
+    std::vector<glm::vec2>  &getTexCoords();
     std::vector<uint16_t>   &getIndices();
     
     void    clear();

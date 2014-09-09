@@ -64,12 +64,20 @@ void glmMesh::addTriangle(uint16_t index1, uint16_t index2, uint16_t index3){
     addIndex(index3);
 }
 
+std::vector<glm::vec4> & glmMesh::getColors(){
+    return colors;
+}
+
 std::vector<glm::vec3> & glmMesh::getVertices(){
 	return vertices;
 }
 
 std::vector<glm::vec3> & glmMesh::getNormals(){
     return normals;
+}
+
+std::vector<glm::vec2> & glmMesh::getTexCoords(){
+    return texCoords;
 }
 
 std::vector<glm::uint16_t> & glmMesh::getIndices(){

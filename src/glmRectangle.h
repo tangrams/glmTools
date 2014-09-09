@@ -2,7 +2,7 @@
 //  glmRectangle.h
 //
 //  Created by Patricio Gonzalez Vivo on 8/27/14.
-//
+//  Inspired by https://github.com/openframeworks/openFrameworks/blob/master/libs/openFrameworks/types/ofRectangle.h
 //
 
 #pragma once

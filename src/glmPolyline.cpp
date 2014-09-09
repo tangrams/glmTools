@@ -201,10 +201,13 @@ void glmPolyline::drawPoints(){
 //  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
 //  https://www.mapbox.com/blog/drawing-antialiased-lines/
 //
-void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width){
+void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width, bool _TRIANGLE_STRIP ){
 
     //  From Matt code
     //
+    
+    uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
+    
     glm::vec3 normi;             // Right normal to segment between previous and current points
     glm::vec3 normip1;           // Right normal to segment between current and next points
     glm::vec3 rightNorm;         // Right "normal" at current point, scaled for miter joint
@@ -266,7 +269,20 @@ void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width){
     _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
     _mesh.addTexCoord(glm::vec2(0.0,1.0));
     
-    _mesh.setDrawMode(GL_TRIANGLE_STRIP);
+    if(_TRIANGLE_STRIP){
+        _mesh.setDrawMode(GL_TRIANGLE_STRIP);
+    } else {
+        _mesh.setDrawMode(GL_TRIANGLES);
+        for (int i = 0; i < size() - 1; i++) {
+            _mesh.addIndex(indexOffset + 2*i+3);
+            _mesh.addIndex(indexOffset + 2*i+2);
+            _mesh.addIndex(indexOffset + 2*i);
+            
+            _mesh.addIndex(indexOffset + 2*i);
+            _mesh.addIndex(indexOffset + 2*i+1);
+            _mesh.addIndex(indexOffset + 2*i+3);
+        }
+    }
 }
 
 void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
