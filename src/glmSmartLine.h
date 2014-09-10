@@ -30,7 +30,7 @@ public:
     void    add(const glm::vec3 &_point);
     
     float   getLength(const int &_index = -1) const;
-    glm::vec3   getPositionAt(const float &_dist) const;
+    glm::vec3 getPositionAt(const float &_dist) const;
     float   getAngleAt(const float &_dist) const;
     float   getFractAt(const float &_dist, const float &_offset=1.) const;
 

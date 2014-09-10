@@ -28,14 +28,7 @@ void glmPolyline::add(const std::vector<glm::vec3> & _points){
     }
 }
 
-void glmPolyline::addVertices(const std::vector<glm::vec3>& verts) {
-    for (int i = 0 ; i < verts.size() ; i++) {
-        add(verts[i]);
-    }
-}
-
-//----------------------------------------------------------
-void glmPolyline::addVertices(const glm::vec3* verts, int numverts) {
+void glmPolyline::add(const glm::vec3* verts, int numverts) {
     for (int i = 0 ; i < numverts ; i++) {
         add(verts[i]);
     }

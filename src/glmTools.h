@@ -1,6 +1,5 @@
 //
 //  Header.h
-//  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 8/25/14.
 //

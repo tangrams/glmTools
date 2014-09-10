@@ -17,10 +17,9 @@ public:
     glmPolyline(){}
     virtual ~glmPolyline(){}
     
-    virtual void    add(const glm::vec3 &_point);
+    virtual void add(const glm::vec3 &_point);
     void    add(const std::vector<glm::vec3> & _points);
-    void    addVertices( const std::vector<glm::vec3>& verts );
-	void    addVertices(const glm::vec3* verts, int numverts);
+	void    add(const glm::vec3* verts, int numverts);
     
     glm::vec3&  operator [](const int &_index);
     glm::vec3   operator [](const int &_index) const;
