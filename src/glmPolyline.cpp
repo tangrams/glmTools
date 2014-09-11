@@ -20,6 +20,7 @@ void glmPolyline::clear(){
 
 void glmPolyline::add( const glm::vec3 & _point ){
     m_points.push_back(_point);
+    m_bChange = true;
 }
 
 void glmPolyline::add(const std::vector<glm::vec3> & _points){
@@ -334,10 +335,15 @@ void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
     }
 }
 
-glm::vec3 glmPolyline::getCentroid() const{
-    glm::vec3 centroid;
-    for (int i = 0; i < m_points.size(); i++) {
-        centroid += m_points[i] / (float)m_points.size();
+glm::vec3 glmPolyline::getCentroid() {
+    
+    if(m_bChange){
+        m_centroid = glm::vec3(0.0,0.0,0.0);
+        for (int i = 0; i < m_points.size(); i++) {
+            m_centroid += m_points[i] / (float)m_points.size();
+        }
+        m_bChange = false;
     }
-    return centroid;
+    
+    return m_centroid;
 }

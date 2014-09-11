@@ -14,7 +14,7 @@
 class glmPolyline {
 public:
     
-    glmPolyline(){}
+    glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){}
     virtual ~glmPolyline(){}
     
     virtual void add(const glm::vec3 &_point);
@@ -24,8 +24,8 @@ public:
     glm::vec3&  operator [](const int &_index);
     glm::vec3   operator [](const int &_index) const;
     
+    glm::vec3   getCentroid();
     std::vector<glm::vec3> & getVertices();
-    glm::vec3   getCentroid() const;
 
 	glmRectangle getBoundingBox() const;
     
@@ -46,4 +46,7 @@ protected:
     virtual void updateCache(){};
     
     std::vector<glm::vec3>  m_points;
+    glm::vec3   m_centroid;
+    
+    bool        m_bChange;
 };
