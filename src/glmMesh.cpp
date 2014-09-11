@@ -242,10 +242,11 @@ void glmMesh::save(std::string _path, bool _useBinary ) const{
 			}
 		}
 		if(m_normals.size()){
+            glm::vec3 norm = glm::normalize(m_normals[i]);
 			if(_useBinary) {
-				os.write((char*) &m_normals[i], sizeof(glm::vec3));
+				os.write((char*) &norm, sizeof(glm::vec3));
 			} else {
-				os << " " << m_normals[i].x << " " << m_normals[i].y << " " << m_normals[i].z;
+				os << " " << norm.x << " " << norm.y << " " << norm.z;
 			}
 		}
 		if(!_useBinary) {

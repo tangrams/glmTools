@@ -167,6 +167,20 @@ std::vector<glm::vec3> & glmPolyline::getVertices(){
 	return m_points;
 }
 
+glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
+    
+    float distance = 0.0;
+    
+    for (int i = 0; i < m_points.size()-1; i++){
+        
+        glmPolarPoint polar(m_points[i],m_points[i+1]);
+        
+        if(distance+polar.r <= _dist){
+            return  m_points[i] + glmPolarPoint(polar.a,_dist-distance).getCartesian();
+        }
+	}
+}
+
 void glmPolyline::draw(){
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < size(); i++) {

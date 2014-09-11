@@ -51,18 +51,22 @@ float glmSmartLine::getAngleAt(const float &_dist) const{
 glm::vec3 glmSmartLine::getPositionAt(const float &_dist) const{
 
     if (size()==2) {
-        return m_points[0] + glm::vec3(_dist*cos(m_polars[0].a),
-                                       _dist*sin(m_polars[0].a),
-                                       0.0f);
+        return m_points[0] + glmPolarPoint(m_polars[0].a,_dist).getCartesian();
+//        return m_points[0] + glm::vec3(_dist*cos(m_polars[0].a),
+//                                       _dist*sin(m_polars[0].a),
+//                                       0.0f);
         
     }
     
     for (int i = 1; i < m_distances.size(); i++) {
         if(_dist<=m_distances[i]){
-            float diff = _dist-m_distances[i];
-            return glm::vec3(m_points[i].x + diff*cos(m_polars[i-1].a),
-                             m_points[i].y + diff*sin(m_polars[i-1].a),
-                             0.0f);
+            
+            return m_points[i] + glmPolarPoint(m_polars[i-1].a,_dist-m_distances[i]).getCartesian();
+            
+//            float diff = _dist-m_distances[i];
+//            return glm::vec3(m_points[i].x + diff*cos(m_polars[i-1].a),
+//                             m_points[i].y + diff*sin(m_polars[i-1].a),
+//                             0.0f);
         }
     }
     
@@ -109,12 +113,12 @@ float glmSmartLine::getLength(const int &_index) const {
 
 void glmSmartLine::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
-        float angle = m_polars[i].a-HALF_PI;
-        
-        glm::vec3 head;
-        head.x = m_polars[i].r * cos(angle);
-        head.y = m_polars[i].r * sin(angle);
-        head.z = 0.0f;
-        drawLine(m_points[i],m_points[i]+head);
+//        float angle = m_polars[i].a-HALF_PI;
+//        glm::vec3 head;
+//        head.x = m_polars[i].r * cos(angle);
+//        head.y = m_polars[i].r * sin(angle);
+//        head.z = 0.0f;
+//        drawLine(m_points[i], m_points[i] + head);
+        drawLine(m_points[i], m_points[i] + glmPolarPoint(m_polars[i].a-HALF_PI,m_polars[i].r).getCartesian());
     }
 }

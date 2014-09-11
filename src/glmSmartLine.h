@@ -11,16 +11,6 @@
 #include "glmTools.h"
 #include "glmPolyline.h"
 
-struct glmPolarPoint {
-    glmPolarPoint(const glm::vec3 &_org, const glm::vec3 &_dst){
-        glm::vec3 diff = _dst - _org;
-        a = atan2(diff.y,diff.x);
-        r = glm::length(glm::vec2(diff.x,diff.y));
-    };
-    
-    float a,r;
-};
-
 class glmSmartLine : public glmPolyline {
 public:
     
