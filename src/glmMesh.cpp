@@ -7,6 +7,9 @@
 
 #include "glmMesh.h"
 
+#include <fstream>
+#include <iostream>
+
 glmMesh::glmMesh(){
     m_drawMode = GL_TRIANGLES;
 }
@@ -168,4 +171,113 @@ void glmMesh::draw(){
 	if(m_normals.size()){
 		glDisableClientState(GL_NORMAL_ARRAY);
 	}
+}
+
+void glmMesh::save(std::string _path, bool _useBinary ) const{
+    
+    std::ios_base::openmode binary_mode = _useBinary ? std::ios::binary : (std::ios_base::openmode)0;
+    std::fstream os(_path.c_str(), std::ios::out | binary_mode);
+    
+	os << "ply" << std::endl;
+	if(_useBinary) {
+		os << "format binary_little_endian 1.0" << std::endl;
+	} else {
+		os << "format ascii 1.0" << std::endl;
+	}
+    
+	if(m_vertices.size()){
+		os << "element vertex " << m_vertices.size() << std::endl;
+		os << "property float x" << std::endl;
+		os << "property float y" << std::endl;
+		os << "property float z" << std::endl;
+		if(m_colors.size()){
+			os << "property uchar red" << std::endl;
+			os << "property uchar green" << std::endl;
+			os << "property uchar blue" << std::endl;
+			os << "property uchar alpha" << std::endl;
+		}
+		if(m_texCoords.size()){
+			os << "property float u" << std::endl;
+			os << "property float v" << std::endl;
+		}
+		if(m_normals.size()){
+			os << "property float nx" << std::endl;
+			os << "property float ny" << std::endl;
+			os << "property float nz" << std::endl;
+		}
+	}
+    
+	unsigned char faceSize = 3;
+	if(m_indices.size()){
+		os << "element face " << m_indices.size() / faceSize << std::endl;
+		os << "property list uchar int vertex_indices" << std::endl;
+	} else if(m_drawMode == GL_TRIANGLES) {
+		os << "element face " << m_indices.size() / faceSize << std::endl;
+		os << "property list uchar int vertex_indices" << std::endl;
+	}
+    
+	os << "end_header" << std::endl;
+    
+	for(int i = 0; i < m_vertices.size(); i++){
+		if(_useBinary) {
+			os.write((char*) &m_vertices[i], sizeof(glm::vec3));
+		} else {
+			os << m_vertices[i].x << " " << m_vertices[i].y << " " << m_vertices[i].z;
+		}
+		if(m_colors.size()){
+			// VCG lib / MeshLab don't support float colors, so we have to cast
+            glm::vec4 c = m_colors[i] * glm::vec4(255,255,255,255);
+            glm::ivec4 cur = glm::ivec4(c.r,c.g,c.b,c.a);
+			if(_useBinary) {
+				os.write((char*) &cur, sizeof(glm::ivec4));
+			} else {
+				os << " " << (int) cur.r << " " << (int) cur.g << " " << (int) cur.b << " " << (int) cur.a;
+			}
+		}
+		if(m_texCoords.size()){
+			if(_useBinary) {
+				os.write((char*) &m_texCoords[i], sizeof(glm::vec2));
+			} else {
+				os << " " << m_texCoords[i].x << " " << m_texCoords[i].y;
+			}
+		}
+		if(m_normals.size()){
+			if(_useBinary) {
+				os.write((char*) &m_normals[i], sizeof(glm::vec3));
+			} else {
+				os << " " << m_normals[i].x << " " << m_normals[i].y << " " << m_normals[i].z;
+			}
+		}
+		if(!_useBinary) {
+			os << std::endl;
+		}
+	}
+    
+	if(m_indices.size()) {
+		for(int i = 0; i < m_indices.size(); i += faceSize) {
+			if(_useBinary) {
+				os.write((char*) &faceSize, sizeof(unsigned char));
+				for(int j = 0; j < faceSize; j++) {
+					int curIndex = m_indices[i + j];
+					os.write((char*) &curIndex, sizeof(int));
+				}
+			} else {
+				os << (int) faceSize << " " << m_indices[i] << " " << m_indices[i+1] << " " << m_indices[i+2] << std::endl;
+			}
+		}
+	} else if(m_drawMode == GL_TRIANGLES) {
+		for(int i = 0; i < m_vertices.size(); i += faceSize) {
+			int indices[] = {i, i + 1, i + 2};
+			if(_useBinary) {
+				os.write((char*) &faceSize, sizeof(unsigned char));
+				for(int j = 0; j < faceSize; j++) {
+					os.write((char*) &indices[j], sizeof(int));
+				}
+			} else {
+				os << (int) faceSize << " " << indices[0] << " " << indices[1] << " " << indices[2] << std::endl;
+			}
+		}
+	}
+    
+    os.close();
 }

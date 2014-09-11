@@ -46,6 +46,7 @@ public:
     const std::vector<glm::vec2>  &getTexCoords() const;
     const std::vector<uint16_t>   &getIndices() const;
     
+    void    save(std::string _path, bool useBinary = false) const;
     void    clear();
     void    draw();
     
