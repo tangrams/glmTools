@@ -333,3 +333,11 @@ void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
         }
     }
 }
+
+glm::vec3 glmPolyline::getCentroid() const{
+    glm::vec3 centroid;
+    for (int i = 0; i < m_points.size(); i++) {
+        centroid += m_points[i] / (float)m_points.size();
+    }
+    return centroid;
+}

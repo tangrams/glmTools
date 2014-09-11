@@ -25,6 +25,7 @@ public:
     glm::vec3   operator [](const int &_index) const;
     
     std::vector<glm::vec3> & getVertices();
+    glm::vec3   getCentroid() const;
 
 	glmRectangle getBoundingBox() const;
     
