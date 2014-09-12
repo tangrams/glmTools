@@ -10,6 +10,7 @@
 
 #include "glmTools.h"
 #include "glmPolyline.h"
+#include "glmPolarPoint.h"
 
 class glmSmartLine : public glmPolyline {
 public:

@@ -6,6 +6,7 @@
 //
 
 #include "glmPolyline.h"
+#include "glmPolarPoint.h"
 
 #include <OpenGL/gl.h>
 
@@ -40,11 +41,11 @@ void glmPolyline::add(const glm::vec3* verts, int numverts) {
     }
 }
 
-glm::vec3& glmPolyline::operator [](const int &_index){
+glm::vec3 & glmPolyline::operator [](const int &_index){
     return m_points[_index];
 }
 
-glm::vec3 glmPolyline::operator [](const int &_index) const {
+const glm::vec3 & glmPolyline::operator [](const int &_index) const {
     return m_points[_index];
 }
 
@@ -168,7 +169,7 @@ void glmPolyline::simplify(float tol){
     updateCache();
 }
 
-std::vector<glm::vec3> & glmPolyline::getVertices(){
+const std::vector<glm::vec3> & glmPolyline::getVertices() const{
 	return m_points;
 }
 

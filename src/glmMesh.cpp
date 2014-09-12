@@ -13,6 +13,23 @@
 #include "tesselator.h"
 
 glmMesh::glmMesh():m_drawMode(GL_TRIANGLES){
+    
+}
+
+glmMesh::glmMesh(const glmMesh &_mother):m_drawMode(_mother.getDrawMode()){
+    add(_mother);
+}
+
+glmMesh::glmMesh(const glmPolyline &_poly):m_drawMode(GL_TRIANGLES){
+    add(_poly);
+}
+
+glmMesh::glmMesh(const std::vector<glmPolyline> &_polylines):m_drawMode(GL_TRIANGLES){
+    add(_polylines);
+}
+
+glmMesh::glmMesh(const glmPolyline &_line, float _lineWidth):m_drawMode(GL_TRIANGLES){
+    add(_line,_lineWidth);
 }
 
 glmMesh::~glmMesh(){
@@ -103,7 +120,7 @@ void glmMesh::add(const glmMesh &_mesh){
     }
 }
 
-void glmMesh::add(glmPolyline &_polyline){
+void glmMesh::add(const glmPolyline &_polyline){
     TESStesselator *m_tess = tessNewTess(NULL);
     
     uint16_t indexOffset = (uint16_t)m_vertices.size();
@@ -165,7 +182,7 @@ void glmMesh::add(glmPolyline &_polyline){
     tessDeleteTess(m_tess);
 }
 
-void glmMesh::add(std::vector<glmPolyline> &_polylines){
+void glmMesh::add(const std::vector<glmPolyline> &_polylines){
     TESStesselator  *m_tess = tessNewTess(NULL);            // Tesselator instance
     uint16_t indexOffset = (uint16_t)m_vertices.size();    // track indices
     

@@ -14,6 +14,11 @@ class glmMesh {
 public:
     
     glmMesh();
+    glmMesh(const glmMesh &_mother);
+    glmMesh(const glmPolyline &_poly);
+    glmMesh(const std::vector<glmPolyline> &_polylines);
+    glmMesh(const glmPolyline &_line, float _lineWidth);
+    
     virtual ~glmMesh();
     
     void    setDrawMode(GLenum _drawMode);
@@ -39,17 +44,17 @@ public:
     void    addTriangle(uint16_t index1, uint16_t index2, uint16_t index3);
     
     void    add(const glmMesh &_mesh);
-    void    add( glmPolyline &_polyline);                           // Close Shape
-    void    add( std::vector<glmPolyline> &_polylines );            // Close Shape with holes
+    void    add(const glmPolyline &_polyline);                      // Close Shape
+    void    add(const std::vector<glmPolyline> &_polylines );       // Close Shape with holes
     void    add(const glmPolyline &_polyline, float _lineWidth);    // Lines
     
     GLenum  getDrawMode() const;
     
-    const std::vector<glm::vec4>  &getColors() const;
-    const std::vector<glm::vec3>  &getVertices() const;
-    const std::vector<glm::vec3>  &getNormals() const;
-    const std::vector<glm::vec2>  &getTexCoords() const;
-    const std::vector<uint16_t>   &getIndices() const;
+    const std::vector<glm::vec4> & getColors() const;
+    const std::vector<glm::vec3> & getVertices() const;
+    const std::vector<glm::vec3> & getNormals() const;
+    const std::vector<glm::vec2> & getTexCoords() const;
+    const std::vector<uint16_t>  & getIndices() const;
     
     void    save(std::string _path, bool useBinary = false) const;
     void    clear();
