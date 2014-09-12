@@ -17,6 +17,7 @@ glmSmartLine::~glmSmartLine(){
 void glmSmartLine::clear(){
     glmPolyline::clear();
     
+    marks.clear();
     m_polars.clear();
     m_distances.clear();
 }
@@ -29,6 +30,14 @@ void glmSmartLine::add( const glm::vec3 & _point ){
         m_distances.push_back(0.0);
     }
     glmPolyline::add(_point);
+}
+
+const std::vector<glmPolarPoint> & glmSmartLine::getPolars() const{
+    return m_polars;
+}
+
+const std::vector<float> & glmSmartLine::getDistances() const{
+    return m_distances;
 }
 
 float glmSmartLine::getAngleAt(const float &_dist) const{
