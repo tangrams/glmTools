@@ -16,11 +16,14 @@ public:
     glmRectangle(const glm::vec4 &_vec4);
     glmRectangle(const glm::ivec4 &_viewPort);
     glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height);
+    virtual ~glmRectangle();
     
     void    set(const glm::vec4 &_vec4);
     void    set(const glm::ivec4 &_viewPort);
     void    set(const float &_x, const float &_y, const float &_width, const float &_height);
-    void    growToInclude(const glm::vec3& p);
+    
+    void    growToInclude(const glm::vec3& _point);
+    void    growToInclude(const std::vector<glm::vec3> &_points);
     
     bool    inside(const float &_px, const float &_py) const;
     bool    inside(const glm::vec3& _p) const;

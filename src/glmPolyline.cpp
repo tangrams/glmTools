@@ -8,7 +8,7 @@
 #include "glmPolyline.h"
 
 #include <OpenGL/gl.h>
-#include "tesselator.h"
+
 
 int glmPolyline::size() const {
     return m_points.size();
@@ -176,7 +176,7 @@ glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
         glmPolarPoint polar(m_points[i],m_points[i+1]);
         
         if(distance+polar.r <= _dist){
-            return  m_points[i] + glmPolarPoint(polar.a,_dist-distance).getCartesian();
+            return  m_points[i] + glmPolarPoint(polar.a,_dist-distance).getXY();
         }
 	}
 }
@@ -189,164 +189,10 @@ void glmPolyline::draw(){
     glEnd();
 }
 
-void glmPolyline::drawStipple(GLushort _pattern){
-    glEnable(GL_LINE_STIPPLE);
-    glLineStipple(1, _pattern);
-    draw();
-    glDisable(GL_LINE_STIPPLE);
-}
-
-void glmPolyline::drawPoints(){
-    glPointSize(3);
-    glBegin(GL_POINTS);
-    for (int i = 0; i < size(); i++) {
-        glVertex2d(m_points[i].x,m_points[i].y);
-    }
-    glEnd();
-    glPointSize(1);
-}
-
-//  http://artgrammer.blogspot.co.uk/2011/07/drawing-polylines-by-tessellation.html
-//  https://www.mapbox.com/blog/drawing-antialiased-lines/
-//
-void glmPolyline::addAsLineToMesh(glmMesh &_mesh, float _width, bool _TRIANGLE_STRIP ){
-
-    //  From Matt code
-    //
-    
-    uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
-    
-    glm::vec3 normi;             // Right normal to segment between previous and current m_points
-    glm::vec3 normip1;           // Right normal to segment between current and next m_points
-    glm::vec3 rightNorm;         // Right "normal" at current point, scaled for miter joint
-    
-    glm::vec3 im1;                   // Previous point coordinates
-    glm::vec3 i0 = m_points[0];    // Current point coordinates
-    glm::vec3 ip1 = m_points[1];   // Next point coordinates
-    
-    normip1.x = ip1.y - i0.y;
-    normip1.y = i0.x - ip1.x;
-    normip1.z = 0.;
-    
-    normip1 = glm::normalize(normip1);
-    
-    rightNorm = glm::vec3(normip1.x*_width,normip1.y*_width,normip1.z*_width);
-    
-    _mesh.addVertex(i0 + rightNorm);
-    _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-    _mesh.addTexCoord(glm::vec2(1.0,0.0));
-    
-    _mesh.addVertex(i0 - rightNorm);
-    _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-    _mesh.addTexCoord(glm::vec2(0.0,0.0));
-    
-    // Loop over intermediate m_points in the polyline
-    //
-    for (int i = 1; i < size() - 1; i++) {
-        im1 = i0;
-        i0 = ip1;
-        ip1 = m_points[i+1];
-        
-        normi = normip1;
-        normip1.x = ip1.y - i0.y;
-        normip1.y = i0.x - ip1.x;
-        normip1.z = 0.0f;
-        normip1 = glm::normalize(normip1);
-        
-        rightNorm = normi + normip1;
-        float scale = sqrtf(2. / (1. + glm::dot(normi,normip1) )) * _width / 2.;
-        rightNorm *= scale;
-        
-        _mesh.addVertex(i0+rightNorm);
-        _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-        _mesh.addTexCoord(glm::vec2(1.0,(float)i/(float)size()));
-        
-        _mesh.addVertex(i0-rightNorm);
-        _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-        _mesh.addTexCoord(glm::vec2(0.0,(float)i/(float)size()));
-        
-    }
-    
-    normip1 *= _width;
-    
-    _mesh.addVertex(ip1 + normip1);
-    _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-    _mesh.addTexCoord(glm::vec2(1.0,1.0));
-    
-    _mesh.addVertex(ip1 - normip1);
-    _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-    _mesh.addTexCoord(glm::vec2(0.0,1.0));
-    
-    if(_TRIANGLE_STRIP){
-        _mesh.setDrawMode(GL_TRIANGLE_STRIP);
-    } else {
-        _mesh.setDrawMode(GL_TRIANGLES);
-        for (int i = 0; i < size() - 1; i++) {
-            _mesh.addIndex(indexOffset + 2*i+3);
-            _mesh.addIndex(indexOffset + 2*i+2);
-            _mesh.addIndex(indexOffset + 2*i);
-            
-            _mesh.addIndex(indexOffset + 2*i);
-            _mesh.addIndex(indexOffset + 2*i+1);
-            _mesh.addIndex(indexOffset + 2*i+3);
-        }
-    }
-}
-
-void glmPolyline::addAsShapeToMesh(glmMesh &_mesh){
-    TESStesselator *m_tess = tessNewTess(NULL);
-    
-    uint16_t indexOffset = (uint16_t)_mesh.getVertices().size();
-    glmRectangle bBox = getBoundingBox();
-
-    _mesh.setDrawMode(GL_TRIANGLES);
-    for (int i = 0; i < m_points.size(); i++) {
-        // Add contour to tesselator
-        tessAddContour(m_tess, 3, &m_points[0].x, sizeof(glm::vec3), m_points.size());
-    }
-    
-    // Tessellate polygon into triangles
-    tessTesselate(m_tess, TESS_WINDING_NONZERO, TESS_POLYGONS, 3, 3, NULL);
-    
-    // Extract triangle elements from tessellator
-    
-    const int numIndices = tessGetElementCount(m_tess);
-    const TESSindex* indices = tessGetElements(m_tess);
-    
-    for (int i = 0; i < numIndices; i++) {
-        const TESSindex* poly = &indices[i*3];
-        for (int j = 0; j < 3; j++) {
-            _mesh.addIndex(poly[j] + indexOffset);
-        }
-    }
-    
-    const int numVertices = tessGetVertexCount(m_tess);
-    const float* vertices = tessGetVertices(m_tess);
-    for (int i = 0; i < numVertices; i++) {
-        
-        _mesh.addTexCoord(glm::vec2(mapValue(vertices[3*i],bBox.getMinX(),bBox.getMaxX(),0.,1.),
-                                    mapValue(vertices[3*i+1],bBox.getMinY(),bBox.getMaxY(),0.,1.)));
-        _mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
-        _mesh.addVertex(glm::vec3(vertices[3*i], vertices[3*i + 1], vertices[3*i + 2]));
-    }
-    
-    tessDeleteTess(m_tess);
-}
-
 glmRectangle glmPolyline::getBoundingBox() const {
 	glmRectangle box;
-    addToBoundingBox(box);
+    box.growToInclude(m_points);
 	return box;
-}
-
-void glmPolyline::addToBoundingBox(glmRectangle &_bbox) const {
-    for(size_t i = 0; i < size(); i++) {
-        if(i == 0) {
-            _bbox.set(m_points[i].x,m_points[i].y,0.,0.);
-        } else {
-            _bbox.growToInclude(m_points[i]);
-        }
-    }
 }
 
 glm::vec3 glmPolyline::getCentroid() {

@@ -7,9 +7,7 @@
 
 #include "glmRectangle.h"
 
-glmRectangle::glmRectangle():
-x(0.0), y(0.0), width(0.0), height(0.0)
-{
+glmRectangle::glmRectangle():x(0.0), y(0.0), width(0.0), height(0.0){
 
 }
 
@@ -23,6 +21,9 @@ glmRectangle::glmRectangle(const glm::ivec4 &_vec4){
 
 glmRectangle::glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height){
     set(_x, _y, _width, _height);
+}
+
+glmRectangle::~glmRectangle(){
 }
 
 void glmRectangle::set(const glm::vec4 &_vec4){
@@ -39,7 +40,6 @@ void glmRectangle::set(const float &_x, const float &_y, const float &_width, co
     width = _width;
     height = _height;
 }
-
 
 //----------------------------------------------------------
 glm::vec3 glmRectangle::getMin() const {
@@ -168,6 +168,12 @@ void glmRectangle::growToInclude(const glm::vec3& p){
     float w = x1 - x0;
     float h = y1 - y0;
     set(x0,y0,w,h);
+}
+
+void glmRectangle::growToInclude(const std::vector<glm::vec3> &_points){
+    for(auto &it: _points){
+        growToInclude(it);
+    }
 }
 
 void glmRectangle::drawBorders(){

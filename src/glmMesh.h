@@ -8,11 +8,13 @@
 #pragma once
 
 #include "glmTools.h"
+#include "glmPolyline.h"
 
 class glmMesh {
 public:
     
     glmMesh();
+    virtual ~glmMesh();
     
     void    setDrawMode(GLenum _drawMode);
     
@@ -37,6 +39,9 @@ public:
     void    addTriangle(uint16_t index1, uint16_t index2, uint16_t index3);
     
     void    add(const glmMesh &_mesh);
+    void    add( glmPolyline &_polyline);                           // Close Shape
+    void    add( std::vector<glmPolyline> &_polylines );            // Close Shape with holes
+    void    add(const glmPolyline &_polyline, float _lineWidth);    // Lines
     
     GLenum  getDrawMode() const;
     
