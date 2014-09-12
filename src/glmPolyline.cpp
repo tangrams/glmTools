@@ -9,6 +9,11 @@
 
 #include <OpenGL/gl.h>
 
+glmPolyline::glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){
+}
+
+glmPolyline::~glmPolyline(){
+}
 
 int glmPolyline::size() const {
     return m_points.size();
@@ -168,16 +173,13 @@ std::vector<glm::vec3> & glmPolyline::getVertices(){
 }
 
 glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
-    
     float distance = 0.0;
-    
     for (int i = 0; i < m_points.size()-1; i++){
-        
         glmPolarPoint polar(m_points[i],m_points[i+1]);
-        
         if(distance+polar.r <= _dist){
             return  m_points[i] + glmPolarPoint(polar.a,_dist-distance).getXY();
         }
+        distance += polar.r;
 	}
 }
 
@@ -196,7 +198,6 @@ glmRectangle glmPolyline::getBoundingBox() const {
 }
 
 glm::vec3 glmPolyline::getCentroid() {
-    
     if(m_bChange){
         m_centroid = glm::vec3(0.0,0.0,0.0);
         for (int i = 0; i < m_points.size(); i++) {
@@ -204,6 +205,53 @@ glm::vec3 glmPolyline::getCentroid() {
         }
         m_bChange = false;
     }
-    
     return m_centroid;
+}
+
+std::vector<glmPolyline> glmPolyline::splitAt(float _dist){
+    std::vector<glmPolyline> RTA;
+    if (size()>0) {
+        glmPolyline buffer;
+        
+        buffer.add(m_points[0]);
+        float distance = 0.0;
+        for (int i = 0; i < m_points.size()-1; i++){
+            glmPolarPoint polar(m_points[i],m_points[i+1]);
+            if(distance+polar.r <= _dist){
+                buffer.add(m_points[i] + glmPolarPoint(polar.a,_dist-distance).getXY());
+                RTA.push_back(buffer);
+                buffer.clear();
+                buffer.add(m_points[i] + glmPolarPoint(polar.a,_dist-distance).getXY());
+                break;
+            }
+            buffer.add(m_points[i+1]);
+            distance += polar.r;
+        }
+        RTA.push_back(buffer);
+    }
+    return RTA;
+}
+
+std::vector<glmPolyline> glmPolyline::splitAtIntersection(const glmPolyline &_other){
+    std::vector<glmPolyline> RTA;
+    
+    if (size()>0 && _other.size()>0) {
+        glmPolyline buffer;
+        
+        buffer.add(m_points[0]);
+        for (int i = 0; i < m_points.size()-1; i++){
+            for (int j = 0; j < _other.size()-1; j++){
+                glm::vec3 intersection;
+                if(lineSegmentIntersection(m_points[i],m_points[i+1], _other[j],_other[j+1], intersection)){
+                    buffer.add(intersection);
+                    RTA.push_back(buffer);
+                    buffer.clear();
+                    buffer.add(intersection);
+                }
+            }
+            buffer.add(m_points[i+1]);
+        }
+        RTA.push_back(buffer);
+    }
+    return RTA;
 }

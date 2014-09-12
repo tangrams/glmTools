@@ -25,15 +25,11 @@ struct glmPolarPoint {
     float a,r,z;
 };
 
-struct glmLinePair {
-    std::vector<glm::vec3> A,B;
-};
-
 class glmPolyline {
 public:
     
-    glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){}
-    virtual ~glmPolyline(){}
+    glmPolyline();
+    virtual ~glmPolyline();
     
     virtual void add(const glm::vec3 &_point);
     void    add(const std::vector<glm::vec3> & _points);
@@ -42,15 +38,17 @@ public:
     glm::vec3&  operator [](const int &_index);
     glm::vec3   operator [](const int &_index) const;
     
-    glm::vec3   getCentroid();
+    virtual glm::vec3   getCentroid();
     std::vector<glm::vec3> & getVertices();
-    glm::vec3   getPositionAt(const float &_dist) const;
+    virtual glm::vec3   getPositionAt(const float &_dist) const;
 
 	glmRectangle getBoundingBox() const;
     
     int     size() const;
 
-    glmLinePair splitAt();
+    std::vector<glmPolyline> splitAt(float _dist);
+    std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other);
+    
     virtual void    clear();
     void    simplify(float tolerance=0.3f);
     
