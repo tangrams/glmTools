@@ -11,6 +11,7 @@
 #include <OpenGL/gl.h>
 
 glmPolyline::glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){
+    m_points.clear();
 }
 
 glmPolyline::~glmPolyline(){
@@ -233,7 +234,7 @@ std::vector<glmPolyline> glmPolyline::splitAt(float _dist){
     return RTA;
 }
 
-std::vector<glmPolyline> glmPolyline::splitAtIntersection(const glmPolyline &_other){
+std::vector<glmPolyline> glmPolyline::splitAtIntersection(const glmPolyline &_other, float _gap){
     std::vector<glmPolyline> RTA;
     
     if (size()>0 && _other.size()>0) {
@@ -242,12 +243,19 @@ std::vector<glmPolyline> glmPolyline::splitAtIntersection(const glmPolyline &_ot
         buffer.add(m_points[0]);
         for (int i = 0; i < m_points.size()-1; i++){
             for (int j = 0; j < _other.size()-1; j++){
+                
                 glm::vec3 intersection;
-                if(lineSegmentIntersection(m_points[i],m_points[i+1], _other[j],_other[j+1], intersection)){
-                    buffer.add(intersection);
+                if(lineSegmentIntersection(m_points[i],m_points[i+1],
+                                           _other[j],_other[j+1],
+                                           intersection)){
+                    
+                    glmPolarPoint polar = glmPolarPoint(m_points[i],m_points[i+1]);
+                    glm::vec3 gap = glmPolarPoint(polar.a,_gap,m_points[i].z).getXY();
+                    
+                    buffer.add(intersection-gap);
                     RTA.push_back(buffer);
                     buffer.clear();
-                    buffer.add(intersection);
+                    buffer.add(intersection+gap);
                 }
             }
             buffer.add(m_points[i+1]);

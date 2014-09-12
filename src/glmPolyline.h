@@ -32,7 +32,7 @@ public:
     virtual int size() const;
 
     std::vector<glmPolyline> splitAt(float _dist);
-    std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other);
+    std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other, float _gap = 1.0);
     
     virtual void    clear();
     virtual void    simplify(float tolerance=0.3f);
