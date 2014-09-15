@@ -36,8 +36,6 @@ public:
     
     virtual int size() const;
 
-    
-    
     std::vector<glmPolyline> splitAt(float _dist);
     std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other, float _gap = 1.0);
     
