@@ -17,7 +17,6 @@ glmSmartLine::~glmSmartLine(){
 void glmSmartLine::clear(){
     glmPolyline::clear();
     
-    marks.clear();
     m_polars.clear();
     m_distances.clear();
 }
