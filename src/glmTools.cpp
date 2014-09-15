@@ -150,3 +150,20 @@ bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_lin
     
 	return false;
 };
+
+// To find orientation of ordered triplet (p, q, r).
+// The function returns following values
+// 0 --> p, q and r are colinear
+// 1 --> Clockwise
+// 2 --> Counterclockwise
+//
+int lineOrientation(const glm::vec3 &_p, const glm::vec3 &_q, const glm::vec3 &_r){
+    // See 10th slides from following link for derivation of the formula
+    // http://www.dcs.gla.ac.uk/~pat/52233/slides/Geometry1x1.pdf
+    int val = (_q.y - _p.y) * (_r.x - _q.x) -
+    (_q.x - _p.x) * (_r.y - _q.y);
+    
+    if (val == 0) return 0;  // colinear
+    
+    return (val > 0)? 1: 2; // clock or counterclock wise
+}

@@ -11,6 +11,18 @@
 glmSmartLine::glmSmartLine(){
 };
 
+glmSmartLine::glmSmartLine(const glmPolyline &_poly){
+    for (int i = 0; i < _poly.size(); i++) {
+        add(_poly[i]);
+    }
+}
+
+glmSmartLine::glmSmartLine(const std::vector<glm::vec3> &_points){
+    for (auto &it : _points) {
+        add(it);
+    }
+}
+
 glmSmartLine::~glmSmartLine(){
 };
 

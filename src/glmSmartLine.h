@@ -16,6 +16,8 @@ class glmSmartLine : public glmPolyline {
 public:
     
     glmSmartLine();
+    glmSmartLine(const glmPolyline &_poly);
+    glmSmartLine(const std::vector<glm::vec3> &_points);
     virtual ~glmSmartLine();
     
     void    add(const glm::vec3 &_point);

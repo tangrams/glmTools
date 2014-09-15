@@ -95,3 +95,6 @@ void drawStippleLine(const glm::vec3 &_a, const glm::vec3 &_b, const GLushort &_
 bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_line1End,
                              const glm::vec3 &_line2Start, const glm::vec3 &_line2End,
                              glm::vec3 &_intersection );
+
+//  http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+int lineOrientation(const glm::vec3 &_p, const glm::vec3 &_q, const glm::vec3 &_r);

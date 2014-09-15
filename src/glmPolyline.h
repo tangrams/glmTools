@@ -14,10 +14,12 @@ class glmPolyline {
 public:
     
     glmPolyline();
+    glmPolyline(const glmPolyline &_poly);
+    glmPolyline(const std::vector<glm::vec3> &_points);
     virtual ~glmPolyline();
     
     virtual void add(const glm::vec3 &_point);
-    void    add(const std::vector<glm::vec3> & _points);
+    void    add(const std::vector<glm::vec3> &_points);
 	void    add(const glm::vec3* verts, int numverts);
     
     glm::vec3 & operator [](const int &_index);
@@ -26,11 +28,16 @@ public:
     virtual glm::vec3   getCentroid();
     virtual const std::vector<glm::vec3> & getVertices() const;
     virtual glm::vec3   getPositionAt(const float &_dist) const;
-
+    virtual glmPolyline getConvexHull();
+    
+    bool    isInside(float _x, float _y);
+    
 	glmRectangle    getBoundingBox() const;
     
     virtual int size() const;
 
+    
+    
     std::vector<glmPolyline> splitAt(float _dist);
     std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other, float _gap = 1.0);
     
