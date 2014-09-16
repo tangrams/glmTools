@@ -35,7 +35,9 @@ public:
     
     void    drawNormals();
     
+    std::vector<float>  marks;
     glm::vec3   originalCentroid;
+    bool        bLetterByLetter;
     
 protected:
     

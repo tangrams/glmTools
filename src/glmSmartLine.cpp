@@ -8,16 +8,16 @@
 
 #include "glmSmartLine.h"
 
-glmSmartLine::glmSmartLine(){
+glmSmartLine::glmSmartLine():originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
 };
 
-glmSmartLine::glmSmartLine(const glmPolyline &_poly){
+glmSmartLine::glmSmartLine(const glmPolyline &_poly):originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
     for (int i = 0; i < _poly.size(); i++) {
         add(_poly[i]);
     }
 }
 
-glmSmartLine::glmSmartLine(const std::vector<glm::vec3> &_points){
+glmSmartLine::glmSmartLine(const std::vector<glm::vec3> &_points):originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
     for (auto &it : _points) {
         add(it);
     }
@@ -28,7 +28,7 @@ glmSmartLine::~glmSmartLine(){
 
 void glmSmartLine::clear(){
     glmPolyline::clear();
-    
+    marks.clear();
     m_polars.clear();
     m_distances.clear();
 }
