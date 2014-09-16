@@ -12,7 +12,7 @@ double x2lon(double x) { return glm::degrees(x / R_EARTH); }
 double lat2y(double lat) { return R_EARTH * log(tan(PI / 4 + glm::radians(lat) / 2)); }
 double lon2x(double lon) { return glm::radians(lon) * R_EARTH; }
 
-float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp ) {
+float mapValue(const float &value, const float &inputMin, const float &inputMax, const float &outputMin, const float &outputMax, bool clamp ) {
 	if (fabs(inputMin - inputMax) < FLT_EPSILON){
 		return outputMin;
 	} else {
@@ -29,6 +29,14 @@ float mapValue(float value, float inputMin, float inputMax, float outputMin, flo
 		}
 		return outVal;
 	}
+}
+
+float lerpValue(const float &_start, const float &_stop, float const &_amt) {
+    if(_start!=_stop){
+        return _start + (_stop-_start) * _amt;
+    } else {
+        return _stop;
+    }
 }
 
 void wrapRad(double &_angle){

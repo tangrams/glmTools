@@ -19,6 +19,10 @@ glmRectangle::glmRectangle(const glm::ivec4 &_vec4){
     set(_vec4);
 }
 
+glmRectangle::glmRectangle(const glmRectangle &_rect, const float &_margin){
+    set(_rect.x-_margin, _rect.y-_margin, _rect.width+_margin*2., _rect.height+_margin*2.);
+}
+
 glmRectangle::glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height){
     set(_x, _y, _width, _height);
 }

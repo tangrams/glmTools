@@ -74,7 +74,8 @@ double lat2y(double lat);
 double lon2x(double lon);
 
 void wrapRad(double &_angle);
-float mapValue(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp = false);
+float mapValue(const float &_value, const float &_inputMin, const float &_inputMax, const float &_outputMin, const float &_outputMax, bool clamp = false);
+float lerpValue(const float &_start, const float &_stop, const float &_amt);
 
 std::string toString(const int &_float);
 std::string toString(const float &_float);
@@ -98,3 +99,5 @@ bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_lin
 
 //  http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 int lineOrientation(const glm::vec3 &_p, const glm::vec3 &_q, const glm::vec3 &_r);
+
+//--------------------------------------------------

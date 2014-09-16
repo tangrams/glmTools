@@ -15,6 +15,7 @@ public:
     glmRectangle();
     glmRectangle(const glm::vec4 &_vec4);
     glmRectangle(const glm::ivec4 &_viewPort);
+    glmRectangle(const glmRectangle &_rectangel, const float &_margin = 0.0);
     glmRectangle(const float &_x, const float &_y, const float &_width, const float &_height);
     virtual ~glmRectangle();
     
