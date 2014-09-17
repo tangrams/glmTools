@@ -28,7 +28,7 @@ public:
     virtual glm::vec3   getCentroid();
     virtual const std::vector<glm::vec3> & getVertices() const;
     virtual glm::vec3   getPositionAt(const float &_dist) const;
-    virtual glmPolyline getConvexHull();
+    virtual glmPolyline get2DConvexHull();
     
     bool    isInside(float _x, float _y);
     

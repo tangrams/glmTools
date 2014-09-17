@@ -97,7 +97,13 @@ bool lineSegmentIntersection(const glm::vec3 &_line1Start, const glm::vec3 &_lin
                              const glm::vec3 &_line2Start, const glm::vec3 &_line2End,
                              glm::vec3 &_intersection );
 
-//  http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-int lineOrientation(const glm::vec3 &_p, const glm::vec3 &_q, const glm::vec3 &_r);
-
-//--------------------------------------------------
+// isLeft(): test if a point is Left|On|Right of an infinite line.
+//    Input:  three points P0, P1, and P2
+//    Return: >0 for P2 left of the line through P0 and P1
+//            =0 for P2 on the line
+//            <0 for P2 right of the line
+//    See: Algorithm 1 on Area of Triangles http://geomalgorithms.com/a10-_hull-1.html
+//
+inline double isLeft( const glm::vec3 &_P0, const glm::vec3 &_P1, const glm::vec3 &_P2 ){
+    return (_P1.x - _P0.x)*(_P2.y - _P0.y) - (_P2.x - _P0.x)*(_P1.y - _P0.y);
+}

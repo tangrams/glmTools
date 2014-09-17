@@ -7,9 +7,8 @@
 
 #include "glmPolyline.h"
 #include "glmPolarPoint.h"
-#include <stack>
-
 #include <OpenGL/gl.h>
+#include <deque>
 
 glmPolyline::glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){
     m_points.clear();
@@ -277,6 +276,7 @@ std::vector<glmPolyline> glmPolyline::splitAtIntersection(const glmPolyline &_ot
 }
 
 // http://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+//
 bool glmPolyline::isInside(float _x, float _y){
 	int counter = 0;
 	double xinters;
@@ -305,47 +305,58 @@ bool glmPolyline::isInside(float _x, float _y){
 	else return true;
 }
 
-// http://www.geeksforgeeks.org/convex-hull-set-1-jarviss-algorithm-or-wrapping/
-// http://www.geeksforgeeks.org/convex-hull-set-2-graham-scan/
-glmPolyline glmPolyline::getConvexHull(){
+//  http://geomalgorithms.com/a12-_hull-3.html
+//
+glmPolyline glmPolyline::get2DConvexHull(){
     glmPolyline rta;
-    int  n = size();
     
-    // There must be at least 3 points
-    if (n < 3) return rta;
+    int n = size();
     
-    // Initialize Result
-    int next[n];
-    for (int i = 0; i < size(); i++)
-        next[i] = -1;
-    
-    // Find the leftmost point
-    int l = 0;
-    for (int i = 1; i < n; i++)
-        if (m_points[i].x < m_points[l].x)
-            l = i;
-    
-    // Start from leftmost point, keep moving counterclockwise
-    // until reach the start point again
-    int p = l, q;
-    do {
-        // Search for a point 'q' such that orientation(p, i, q) is
-        // counterclockwise for all points 'i'
-        q = (p+1)%size();
-        for (int i = 0; i < size(); i++)
-            if (lineOrientation(m_points[p], m_points[i], m_points[q]) == 2)
-                q = i;
-        
-        next[p] = q;  // Add q to result as a next point of p
-        p = q; // Set p as q for next iteration
-    } while (p != l);
-    
-    // Print Result
-    for (int i = 0; i < n; i++){
-        if (next[i] != -1){
-            rta.add(m_points[i]);
+    if(n > 3){
+        // initialize a deque D[] from bottom to top so that the
+        // 1st three vertices of P[] are a ccw triangle
+        glm::vec3* D = new glm::vec3[2*n+1];
+        int bot = n-2, top = bot+3;    // initial bottom and top deque indices
+        D[bot] = D[top] = m_points[2];        // 3rd vertex is at both bot and top
+        if (isLeft(m_points[0], m_points[1], m_points[2]) > 0) {
+            D[bot+1] = m_points[0];
+            D[bot+2] = m_points[1];           // ccw vertices are: 2,0,1,2
+        } else {
+            D[bot+1] = m_points[1];
+            D[bot+2] = m_points[0];           // ccw vertices are: 2,1,0,2
         }
+        
+        // compute the hull on the deque D[]
+        for (int i=3; i < n; i++) {   // process the rest of vertices
+            // test if next vertex is inside the deque hull
+            if ((isLeft(D[bot], D[bot+1], m_points[i]) > 0) &&
+                (isLeft(D[top-1], D[top], m_points[i]) > 0) )
+                continue;         // skip an interior vertex
+            
+            // incrementally add an exterior vertex to the deque hull
+            // get the rightmost tangent at the deque bot
+            while (isLeft(D[bot], D[bot+1], m_points[i]) <= 0)
+                ++bot;                 // remove bot of deque
+            D[--bot] = m_points[i];           // insert P[i] at bot of deque
+            
+            // get the leftmost tangent at the deque top
+            while (isLeft(D[top-1], D[top], m_points[i]) <= 0)
+                --top;                 // pop top of deque
+            D[++top] = m_points[i];           // push P[i] onto top of deque
+        }
+        
+        // transcribe deque D[] to the output hull array H[]
+        int h;        // hull vertex counter
+        for (h=0; h <= (top-bot); h++){
+            rta.add( D[bot + h]);
+        }
+        delete D;
     }
     
     return rta;
 }
+
+//  Other convex hull Reference
+//
+// http://www.geeksforgeeks.org/convex-hull-set-1-jarviss-algorithm-or-wrapping/
+// http://www.geeksforgeeks.org/convex-hull-set-2-graham-scan/
