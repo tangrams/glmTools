@@ -45,6 +45,11 @@ void glmRectangle::set(const float &_x, const float &_y, const float &_width, co
     height = _height;
 }
 
+void glmRectangle::translate(const glm::vec3 &_pos){
+    x += _pos.x;
+    y += _pos.y;
+}
+
 //----------------------------------------------------------
 glm::vec3 glmRectangle::getMin() const {
     return glm::vec3(getMinX(),getMinY(),0.);

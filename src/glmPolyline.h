@@ -16,6 +16,7 @@ public:
     glmPolyline();
     glmPolyline(const glmPolyline &_poly);
     glmPolyline(const std::vector<glm::vec3> &_points);
+    glmPolyline(const glmRectangle &_rect, float _radiants = 0);
     virtual ~glmPolyline();
     
     virtual void add(const glm::vec3 &_point);

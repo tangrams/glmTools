@@ -23,6 +23,8 @@ public:
     void    set(const glm::ivec4 &_viewPort);
     void    set(const float &_x, const float &_y, const float &_width, const float &_height);
     
+    void    translate(const glm::vec3 &_pos);
+    
     void    growToInclude(const glm::vec3& _point);
     void    growToInclude(const std::vector<glm::vec3> &_points);
     

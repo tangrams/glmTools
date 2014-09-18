@@ -24,6 +24,31 @@ glmPolyline::glmPolyline(const std::vector<glm::vec3> & _points):m_centroid(0.0,
     add(_points);
 }
 
+glmPolyline::glmPolyline(const glmRectangle &_rect, float _radiants){
+    if(_radiants == 0){
+        add(_rect.getTopLeft());
+        add(_rect.getTopRight());
+        add(_rect.getBottomRight());
+        add(_rect.getBottomLeft());
+    } else {
+        
+        glmPolarPoint toTR = glmPolarPoint(_rect.getCenter(),_rect.getTopRight());
+        glmPolarPoint toBR = glmPolarPoint(_rect.getCenter(),_rect.getBottomRight());
+        
+        toTR.a += _radiants;
+        toBR.a += _radiants;
+        
+        add(toTR.getXY());
+        add(toBR.getXY());
+        
+        toTR.a += PI;
+        toBR.a += PI;
+
+        add(toTR.getXY());
+        add(toBR.getXY());
+    }
+}
+
 glmPolyline::~glmPolyline(){
 }
 
