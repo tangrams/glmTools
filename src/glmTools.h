@@ -87,6 +87,7 @@ inline std::istream& operator>>(std::istream& is, glm::vec3& vec);
 
 glm::vec3 getCentroid(std::vector<glm::vec3> &_pts);
 
+void drawArrow(const glm::vec3 &_pos, const float &_angle, const float &_width = 6.0);
 void drawCross(const glm::vec3 &_pos, const float &_width = 3.5);
 
 void drawLine(const glm::vec3 &_a, const glm::vec3 &_b);
