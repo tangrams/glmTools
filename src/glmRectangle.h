@@ -56,7 +56,7 @@ public:
     glm::vec3   getBottomRight() const;
     
     void    drawBorders();
-    void    drawCorners(const float &_width = 3.);
+    void    drawCorners(const float &_width = 4.);
     
     float   x,y,width,height;
 };
