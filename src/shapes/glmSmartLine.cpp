@@ -34,12 +34,18 @@ void glmSmartLine::clear(){
 }
 
 void glmSmartLine::add( const glm::vec3 & _point ){
+    
+    //  Cache distances and angles between points together with total distance to fast use
+    //
     if(size()>0){
         m_polars.push_back( glmPolarPoint(m_points[m_points.size()-1],_point) );
         m_distances.push_back( m_distances[m_distances.size()-1] + m_polars[m_polars.size()-1].r );
     } else {
         m_distances.push_back(0.0);
     }
+    
+    //  Add point in a regular way
+    //
     glmPolyline::add(_point);
 }
 
@@ -70,16 +76,15 @@ float glmSmartLine::getAngleAt(const float &_dist) const{
 
 glm::vec3 glmSmartLine::getPositionAt(const float &_dist) const{
 
-    if (size()==2) {
-        return m_points[0] + glmPolarPoint(m_polars[0].a,_dist).getXY();
-    }
-    
-    for (int i = 1; i < m_distances.size(); i++) {
-        if(_dist<=m_distances[i]){
-            return m_points[i] + glmPolarPoint(m_polars[i-1].a,_dist-m_distances[i]).getXY();
+    for (int i = 0; i < m_distances.size()-1; i++) {
+        if(_dist<m_distances[i+1]){
+            float pct = (_dist-m_distances[i])/m_polars[i].r;
+            return m_points[i] + (m_points[i+1]-m_points[i])*pct;
         }
     }
     
+    //  For distances out of range
+    //
     return m_points[size()-1];
 }
 
