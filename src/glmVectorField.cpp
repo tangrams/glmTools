@@ -27,7 +27,7 @@ void glmVectorField::deallocate(){
     }
 }
 
-void glmVectorField::set( int _width, int _height, int _res ){
+bool glmVectorField::set( int _width, int _height, int _res ){
     
     if(m_width != _width || m_height != _height || m_resolution != _res){
 
@@ -54,6 +54,10 @@ void glmVectorField::set( int _width, int _height, int _res ){
                 m_forces[j][i] = glm::vec3(0.,0.,0.);
             }
         }
+        
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -76,10 +80,63 @@ glm::vec3 &	glmVectorField::getForceAt(const glm::vec3 &_pos){
     }
 }
 
+void glmVectorField::addRepelForce(const glm::vec3 &_pos, float _radius, float _strength) {
+    
+    float pctX = _pos.x / m_width;
+    float pctY = _pos.y / m_height;
+    
+    int cols = m_width / m_resolution;
+    int rows = m_height / m_resolution;
+    
+    int xVal = pctX * cols;
+    int yVal = pctY * rows;
+    
+    for( int x = 0; x < m_cols; x++){
+        for( int y = 0; y < m_rows; y++){
+            glm::vec3 np = glm::vec3( x*m_resolution, y*m_resolution, 0.0 );
+            
+            if( glm::distance(_pos, np) < _radius ){
+                float pct = 1 - ( glm::distance(_pos, np) / _radius);
+                glm::vec3 dir = glm::normalize(np - _pos);
+                m_forces[x][y] += dir * _strength * pct;
+            }
+        }
+    }
+}
+
+void glmVectorField::addRepelBorders(float _strength){
+    
+    glm::vec3 toCenter = glm::vec3(m_width*0.5,m_height*0.5,0.);
+    for (int x = 0; x < m_cols; x++) {
+        int y = 0;
+        glm::vec3 np = glm::vec3( x*m_resolution, y*m_resolution, 0.0 );
+        m_forces[x][y] += glm::normalize(toCenter - np )*_strength;
+        
+        y = m_rows-1;
+        np = glm::vec3( x*m_resolution, y*m_resolution, 0.0 );
+        m_forces[x][y] += glm::normalize(toCenter - np )*_strength;
+    }
+    
+    for (int y = 0; y < m_rows; y++) {
+        int x = 0;
+        glm::vec3 np = glm::vec3( x*m_resolution, y*m_resolution, 0.0 );
+        m_forces[x][y] += glm::normalize(toCenter - np )*_strength;
+        
+        x = m_cols-1;
+        np = glm::vec3( x*m_resolution, y*m_resolution, 0.0 );
+        m_forces[x][y] += glm::normalize(toCenter - np )*_strength;
+    }
+}
+
 void glmVectorField::draw(){
     for( int x = 0; x < m_cols; x++){
         for( int y = 0; y < m_rows; y++){
-            drawCross( glm::vec3( x*m_resolution, y*m_resolution, 0.0), 5 );
+            glm::vec3 pos = glm::vec3( x*m_resolution, y*m_resolution, 0.0);
+            drawCross( pos, 5 );
+            pos += glm::vec3(m_resolution*0.5,m_resolution*0.5,0.);
+            drawLine(pos, pos+m_forces[x][y]);
+            float angle = atan2f(m_forces[x][y].y, m_forces[x][y].x);
+            drawArrow(pos+m_forces[x][y], angle,5);
         }
     }
 }

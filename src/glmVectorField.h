@@ -14,9 +14,12 @@ public:
     glmVectorField();
     virtual ~glmVectorField();
     
-    void    set( int _width, int _height, int _res );
+    bool    set( int _width, int _height, int _res );
     
     glm::vec3 &	getForceAt(const glm::vec3 &_pos);
+    
+    void    addRepelForce(const glm::vec3 &_pos, float _radius, float _strength);
+    void    addRepelBorders(float _strength);
     
     void    draw();
 

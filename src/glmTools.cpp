@@ -130,12 +130,12 @@ void drawCross(const glm::vec3 &_pos, const float &_width ){
 }
 
 void drawLine(const glm::vec3 &_a, const glm::vec3 &_b){
-    glm::vec3 linePoints[2];
-    linePoints[0] = _a;
-    linePoints[1] = _b;
+    glm::ivec3 linePoints[2];
+    linePoints[0] = glm::ivec3(_a.x,_a.y,_a.z);
+    linePoints[1] = glm::ivec3(_b.x,_b.y,_b.z);;
     
     glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, sizeof(glm::vec3), &linePoints[0].x);
+	glVertexPointer(2, GL_INT, sizeof(glm::ivec3), &linePoints[0].x);
 	glDrawArrays(GL_LINES, 0, 2);
 };
 
