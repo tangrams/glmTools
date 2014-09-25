@@ -21,7 +21,8 @@ public:
     void    addRepelForce(const glm::vec3 &_pos, float _radius, float _strength);
     void    addRepelBorders(float _strength);
     
-    void    draw();
+    void    drawGrid();
+    void    drawForces();
 
 private:
     void    deallocate();

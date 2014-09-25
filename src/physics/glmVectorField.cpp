@@ -128,11 +128,18 @@ void glmVectorField::addRepelBorders(float _strength){
     }
 }
 
-void glmVectorField::draw(){
+void glmVectorField::drawGrid(){
+    for( int x = 0; x < m_cols; x++){
+        for( int y = 0; y < m_rows; y++){
+            drawCross( glm::vec3( x*m_resolution, y*m_resolution, 0.0), 5 );
+        }
+    }
+}
+
+void glmVectorField::drawForces(){
     for( int x = 0; x < m_cols; x++){
         for( int y = 0; y < m_rows; y++){
             glm::vec3 pos = glm::vec3( x*m_resolution, y*m_resolution, 0.0);
-            drawCross( pos, 5 );
             pos += glm::vec3(m_resolution*0.5,m_resolution*0.5,0.);
             drawLine(pos, pos+m_forces[x][y]);
             float angle = atan2f(m_forces[x][y].y, m_forces[x][y].x);
