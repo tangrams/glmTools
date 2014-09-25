@@ -81,6 +81,8 @@ std::string toString(const int &_float);
 std::string toString(const float &_float);
 std::string toString(const double &_float);
 
+void stringPurifier ( std::string& s );
+
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec);
 
 inline std::istream& operator>>(std::istream& is, glm::vec3& vec);

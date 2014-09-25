@@ -68,6 +68,14 @@ std::string toString(const char &_char){
     return strStream.str();
 }
 
+void stringPurifier ( std::string& s ){
+    for ( std::string::iterator it = s.begin(), itEnd = s.end(); it!=itEnd; ++it){
+        if ( static_cast<unsigned int>(*it) < 32 || static_cast<unsigned int>(*it) > 127 ){
+            (*it) = ' ';
+        }
+    }
+}
+
 inline std::ostream& operator<<(std::ostream& os, const glm::vec3& vec) {
 	os << vec.x << ", " << vec.y << ", " << vec.z;
 	return os;
