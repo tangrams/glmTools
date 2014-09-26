@@ -1,39 +1,38 @@
 //
-//  glmSmartLine.cpp
+//  glmFastPolyline.cpp
 //  Labeling
 //
 //  Created by Patricio Gonzalez Vivo on 9/8/14.
 //
 //
 
-#include "glmSmartLine.h"
+#include "glmFastPolyline.h"
 
-glmSmartLine::glmSmartLine():originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
+glmFastPolyline::glmFastPolyline(){
 };
 
-glmSmartLine::glmSmartLine(const glmPolyline &_poly):originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
+glmFastPolyline::glmFastPolyline(const glmPolyline &_poly){
     for (int i = 0; i < _poly.size(); i++) {
         add(_poly[i]);
     }
 }
 
-glmSmartLine::glmSmartLine(const std::vector<glm::vec3> &_points):originalCentroid(0.0,0.0,0.0),bLetterByLetter(false){
+glmFastPolyline::glmFastPolyline(const std::vector<glm::vec3> &_points){
     for (auto &it : _points) {
         add(it);
     }
 }
 
-glmSmartLine::~glmSmartLine(){
+glmFastPolyline::~glmFastPolyline(){
 };
 
-void glmSmartLine::clear(){
+void glmFastPolyline::clear(){
     glmPolyline::clear();
-    marks.clear();
     m_polars.clear();
     m_distances.clear();
 }
 
-void glmSmartLine::add( const glm::vec3 & _point ){
+void glmFastPolyline::add( const glm::vec3 & _point ){
     
     //  Cache distances and angles between points together with total distance to fast use
     //
@@ -49,15 +48,15 @@ void glmSmartLine::add( const glm::vec3 & _point ){
     glmPolyline::add(_point);
 }
 
-const std::vector<glmPolarPoint> & glmSmartLine::getPolars() const{
+const std::vector<glmPolarPoint> & glmFastPolyline::getPolars() const{
     return m_polars;
 }
 
-const std::vector<float> & glmSmartLine::getDistances() const{
+const std::vector<float> & glmFastPolyline::getDistances() const{
     return m_distances;
 }
 
-float glmSmartLine::getAngleAt(const float &_dist) const{
+float glmFastPolyline::getAngleAt(const float &_dist) const{
     
     if(m_polars.size() == 0 || m_distances.size() == 0){
         return -1;
@@ -74,7 +73,7 @@ float glmSmartLine::getAngleAt(const float &_dist) const{
     return 0;
 }
 
-glm::vec3 glmSmartLine::getPositionAt(const float &_dist) const{
+glm::vec3 glmFastPolyline::getPositionAt(const float &_dist) const{
 
     for (int i = 0; i < m_distances.size()-1; i++) {
         if(_dist<m_distances[i+1]){
@@ -88,7 +87,7 @@ glm::vec3 glmSmartLine::getPositionAt(const float &_dist) const{
     return m_points[size()-1];
 }
 
-float glmSmartLine::getFractAt(const float &_dist, const float &_offset) const{
+float glmFastPolyline::getFractAt(const float &_dist, const float &_offset) const{
     float a = getAngleAt(_dist-_offset);
     float b = getAngleAt(_dist+_offset);
     
@@ -99,7 +98,7 @@ float glmSmartLine::getFractAt(const float &_dist, const float &_offset) const{
     return abs(diff)/PI;
 }
 
-void glmSmartLine::updateCache(){
+void glmFastPolyline::updateCache(){
     m_polars.clear();
     m_distances.clear();
     
@@ -113,7 +112,7 @@ void glmSmartLine::updateCache(){
     m_distances.push_back( total );
 }
 
-float glmSmartLine::getLength(const int &_index) const {
+float glmFastPolyline::getLength(const int &_index) const {
     
     if(_index >= size() || size() == 0){
         return -1;
@@ -126,7 +125,7 @@ float glmSmartLine::getLength(const int &_index) const {
     }
 }
 
-void glmSmartLine::drawNormals(){
+void glmFastPolyline::drawNormals(){
     for (int i = 0; i < size()-1; i++) {
         drawLine(m_points[i], m_points[i] + glmPolarPoint(m_polars[i].a-HALF_PI,m_polars[i].r).getXY());
     }

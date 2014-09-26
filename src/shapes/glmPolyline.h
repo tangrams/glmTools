@@ -30,10 +30,9 @@ public:
     virtual const std::vector<glm::vec3> & getVertices() const;
     virtual glm::vec3   getPositionAt(const float &_dist) const;
     virtual glmPolyline get2DConvexHull();
+	glmRectangle        getBoundingBox() const;
     
     bool    isInside(float _x, float _y);
-    
-	glmRectangle    getBoundingBox() const;
     
     virtual int size() const;
 
