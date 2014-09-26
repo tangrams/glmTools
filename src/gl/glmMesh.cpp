@@ -153,7 +153,7 @@ void glmMesh::add(const glmPolyline &_polyline){
             
             addTexCoord(glm::vec2(mapValue(vertices[3*i],bBox.getMinX(),bBox.getMaxX(),0.,1.),
                                   mapValue(vertices[3*i+1],bBox.getMinY(),bBox.getMaxY(),0.,1.)));
-            addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+            addNormal(UP_NORMAL);
             addVertex(glm::vec3(vertices[3*i], vertices[3*i + 1], vertices[3*i + 2]));
         }
         
@@ -220,7 +220,7 @@ void glmMesh::add(const std::vector<glmPolyline> &_polylines){
         for (int i = 0; i < numVertices; i++) {
             addTexCoord(glm::vec2(mapValue(vertices[3*i],bBox.getMinX(),bBox.getMaxX(),0.,1.),
                                   mapValue(vertices[3*i+1],bBox.getMinY(),bBox.getMaxY(),0.,1.)));
-            addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+            addNormal(UP_NORMAL);
             addVertex(glm::vec3(vertices[3*i], vertices[3*i + 1], vertices[3*i + 2]));
         }
     } else if(m_drawMode == GL_TRIANGLE_STRIP){
@@ -272,11 +272,11 @@ void glmMesh::add(const glmPolyline &_polyline, float _lineWidth){
     rightNorm = glm::vec3(normip1.x*_lineWidth,normip1.y*_lineWidth,normip1.z*_lineWidth);
     
     addVertex(i0 + rightNorm);
-    addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+    addNormal(UP_NORMAL);
     addTexCoord(glm::vec2(1.0,0.0));
     
     addVertex(i0 - rightNorm);
-    addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+    addNormal(UP_NORMAL);
     addTexCoord(glm::vec2(0.0,0.0));
     
     // Loop over intermediate m_points in the polyline
@@ -297,11 +297,11 @@ void glmMesh::add(const glmPolyline &_polyline, float _lineWidth){
         rightNorm *= scale;
         
         addVertex(i0+rightNorm);
-        addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+        addNormal(UP_NORMAL);
         addTexCoord(glm::vec2(1.0,(float)i/(float)_polyline.size()));
         
         addVertex(i0-rightNorm);
-        addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+        addNormal(UP_NORMAL);
         addTexCoord(glm::vec2(0.0,(float)i/(float)_polyline.size()));
         
     }
@@ -309,11 +309,11 @@ void glmMesh::add(const glmPolyline &_polyline, float _lineWidth){
     normip1 *= _lineWidth;
     
     addVertex(ip1 + normip1);
-    addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+    addNormal(UP_NORMAL);
     addTexCoord(glm::vec2(1.0,1.0));
     
     addVertex(ip1 - normip1);
-    addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+    addNormal(UP_NORMAL);
     addTexCoord(glm::vec2(0.0,1.0));
     
     if (m_drawMode == GL_TRIANGLES){

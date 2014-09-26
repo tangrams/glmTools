@@ -62,6 +62,14 @@ float glmFastPolyline::getAngleAt(const float &_dist) const{
         return -1;
     } else if(_dist <= 0){
         return m_polars[0].a;
+    } else if (_dist >= getLength()){
+        return m_polars[m_polars.size()-1].a;
+    }
+    
+    for (int i = 1; i < m_distances.size(); i++) {
+        if(_dist<=m_distances[i]){
+            return m_polars[i-1].a;
+        }
     }
     
     for (int i = 1; i < m_distances.size(); i++) {
@@ -75,6 +83,12 @@ float glmFastPolyline::getAngleAt(const float &_dist) const{
 
 glm::vec3 glmFastPolyline::getPositionAt(const float &_dist) const{
 
+    if(_dist <= 0){
+        return m_points[0];
+    } else if (_dist >= getLength()){
+        return m_points[size()-1];
+    }
+    
     // We improve it with @sevko. Check for JS implementation at https://github.com/pelias/line-interpolate-points
     //
     for (int i = 0; i < m_distances.size()-1; i++) {

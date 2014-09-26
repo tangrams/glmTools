@@ -16,6 +16,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+
 #ifndef PI
 #define PI       3.14159265358979323846
 #endif
@@ -67,6 +68,8 @@
 #ifndef ABS
 #define ABS(x) (((x) < 0) ? -(x) : (x))
 #endif
+
+const glm::vec3 UP_NORMAL = glm::vec3(0.0f, 0.0f, 1.0f);
 
 double y2lat(double y);
 double x2lon(double x);
