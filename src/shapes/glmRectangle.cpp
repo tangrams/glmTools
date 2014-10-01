@@ -169,6 +169,40 @@ bool glmRectangle::intersects(const glm::vec3& p0, const glm::vec3& p1) const {
     lineSegmentIntersection(p0, p1, bottomLeft,  topLeft,     p);   // cross left
 }
 
+bool glmRectangle::clip( glm::vec3& _p0, glm::vec3& _p1) const {
+    
+    glm::vec3 topLeft     = getTopLeft();
+    glm::vec3 topRight    = getTopRight();
+    glm::vec3 bottomRight = getBottomRight();
+    glm::vec3 bottomLeft  = getBottomLeft();
+    
+    if (!inside(_p0)) {
+        glm::vec3 r;
+        if (lineSegmentIntersection(_p0, _p1, topLeft,     topRight,    r)){
+            _p0 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, topRight,    bottomRight, r)){
+            _p0 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, bottomRight, bottomLeft,  r)){
+            _p0 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, bottomLeft,  topLeft,     r)){
+            _p0 = r;
+        }
+    }
+    
+    if (!inside(_p1)) {
+        glm::vec3 r;
+        if (lineSegmentIntersection(_p0, _p1, topLeft,     topRight,    r)){
+            _p1 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, topRight,    bottomRight, r)){
+            _p1 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, bottomRight, bottomLeft,  r)){
+            _p1 = r;
+        } else if (lineSegmentIntersection(_p0, _p1, bottomLeft,  topLeft,     r)){
+            _p1 = r;
+        }
+    }
+}
+
 void glmRectangle::growToInclude(const glm::vec3& p){
     float x0 = MIN(getMinX(),p.x);
     float x1 = MAX(getMaxX(),p.x);

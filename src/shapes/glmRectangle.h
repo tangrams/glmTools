@@ -35,6 +35,7 @@ public:
     
     bool    intersects(const glmRectangle& _rect) const;
     bool    intersects(const glm::vec3& _p0, const glm::vec3& _p1) const;
+    bool    clip( glm::vec3& _p0, glm::vec3& _p1) const;
     
     float   getMinX() const;
     float   getMaxX() const;
