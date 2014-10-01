@@ -91,6 +91,8 @@ glm::vec3 glmFastPolyline::getPositionAt(const float &_dist) const{
     
     // We improve it with @sevko. Check for JS implementation at https://github.com/pelias/line-interpolate-points
     //
+    
+    //  Linear Search
     for (int i = 0; i < m_distances.size()-1; i++) {
         if(_dist<m_distances[i+1]){
             float pct = (_dist-m_distances[i])/m_polars[i].r;
@@ -114,6 +116,9 @@ float glmFastPolyline::getFractAt(const float &_dist, const float &_offset) cons
 }
 
 void glmFastPolyline::updateCache(){
+    
+    //  TODO: only update the once that change
+    //
     m_polars.clear();
     m_distances.clear();
     
@@ -138,6 +143,11 @@ float glmFastPolyline::getLength(const int &_index) const {
     } else {
         return m_distances[_index];
     }
+}
+
+void glmFastPolyline::simplify(float _tol){
+    glmPolyline::simplify(_tol);
+    updateCache();
 }
 
 void glmFastPolyline::drawNormals(){

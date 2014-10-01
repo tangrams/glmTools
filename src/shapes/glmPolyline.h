@@ -23,7 +23,7 @@ public:
     void    add(const std::vector<glm::vec3> &_points);
 	void    add(const glm::vec3* verts, int numverts);
     
-    glm::vec3 & operator [](const int &_index);
+    virtual glm::vec3 & operator [](const int &_index);
     const glm::vec3 & operator [](const int &_index) const;
     
     virtual glm::vec3   getCentroid();
@@ -40,13 +40,11 @@ public:
     std::vector<glmPolyline> splitAtIntersection(const glmPolyline &_other, float _gap = 1.0);
     
     virtual void    clear();
-    virtual void    simplify(float tolerance=0.3f);
+    virtual void    simplify(float _tolerance=0.3f);
     
     void    draw();
 
 protected:
-    virtual void updateCache(){};
-    
     std::vector<glm::vec3>  m_points;
     glm::vec3   m_centroid;
     

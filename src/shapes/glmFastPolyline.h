@@ -22,19 +22,19 @@ public:
     virtual void add(const glm::vec3 &_point);
     virtual void clear();
     
-    float       getLength(const int &_index = -1) const;
-    glm::vec3   getPositionAt(const float &_dist) const;
-    float       getAngleAt(const float &_dist) const;
-    float       getFractAt(const float &_dist, const float &_offset=1.) const;
+    virtual float       getLength(const int &_index = -1) const;
+    virtual glm::vec3   getPositionAt(const float &_dist) const;
+    virtual float       getAngleAt(const float &_dist) const;
+    virtual float       getFractAt(const float &_dist, const float &_offset=1.) const;
     
     const std::vector<float> & getDistances() const;
     const std::vector<glmPolarPoint> & getPolars() const;
     
-    void    drawNormals();
+    virtual void    simplify(float _tol);
+    virtual void    updateCache();
+    virtual void    drawNormals();
     
 protected:
-
-    void    updateCache();
     std::vector<glmPolarPoint>  m_polars;
     std::vector<float>          m_distances;
 };

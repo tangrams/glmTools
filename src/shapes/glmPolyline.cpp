@@ -156,7 +156,7 @@ static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
     return;
 }
 
-void glmPolyline::simplify(float tol){
+void glmPolyline::simplify(float _tolerance){
     if(m_points.size() < 2) return;
     
 	int n = size();
@@ -169,7 +169,7 @@ void glmPolyline::simplify(float tol){
 	sV.resize(n);
     
     int    i, k, m, pv;            // misc counters
-    float  tol2 = tol * tol;       // tolerance squared
+    float  tol2 = _tolerance * _tolerance;       // tolerance squared
     std::vector<glm::vec3> vt;
     std::vector<int> mk;
     vt.resize(n);
@@ -188,7 +188,7 @@ void glmPolyline::simplify(float tol){
     
     // STAGE 2.  Douglas-Peucker polyline simplification
     mk[0] = mk[k-1] = 1;       // mark the first and last vertices
-    simplifyDP( tol, &vt[0], 0, k-1, &mk[0] );
+    simplifyDP( _tolerance, &vt[0], 0, k-1, &mk[0] );
     
     // copy marked vertices to the output simplified polyline
     for (i=m=0; i<k; i++) {
@@ -201,8 +201,6 @@ void glmPolyline::simplify(float tol){
 	}else{
 		m_points = sV;
 	}
-    
-    updateCache();
 }
 
 const std::vector<glm::vec3> & glmPolyline::getVertices() const{
