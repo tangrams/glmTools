@@ -191,13 +191,13 @@ bool glmRectangle::clip( glm::vec3& _p0, glm::vec3& _p1) const {
     
     if (!inside(_p1)) {
         glm::vec3 r;
-        if (lineSegmentIntersection(_p0, _p1, topLeft,     topRight,    r)){
+        if (lineSegmentIntersection(_p1, _p0, topLeft,     topRight,    r)){
             _p1 = r;
-        } else if (lineSegmentIntersection(_p0, _p1, topRight,    bottomRight, r)){
+        } else if (lineSegmentIntersection(_p1, _p0, topRight,    bottomRight, r)){
             _p1 = r;
-        } else if (lineSegmentIntersection(_p0, _p1, bottomRight, bottomLeft,  r)){
+        } else if (lineSegmentIntersection(_p1, _p0, bottomRight, bottomLeft,  r)){
             _p1 = r;
-        } else if (lineSegmentIntersection(_p0, _p1, bottomLeft,  topLeft,     r)){
+        } else if (lineSegmentIntersection(_p1, _p0, bottomLeft,  topLeft,     r)){
             _p1 = r;
         }
     }
