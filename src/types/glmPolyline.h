@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "glmTools.h"
 #include "glmRectangle.h"
 
 class glmPolyline {
@@ -24,8 +23,9 @@ public:
 	void    add(const glm::vec3* verts, int numverts);
     
     virtual glm::vec3 & operator [](const int &_index);
-    const glm::vec3 & operator [](const int &_index) const;
+    virtual const glm::vec3 & operator [](const int &_index) const;
     
+    virtual float       getArea();
     virtual glm::vec3   getCentroid();
     virtual const std::vector<glm::vec3> & getVertices() const;
     virtual glm::vec3   getPositionAt(const float &_dist) const;
@@ -42,8 +42,6 @@ public:
     virtual void    clear();
     virtual void    simplify(float _tolerance=0.3f);
     
-    void    draw();
-
 protected:
     std::vector<glm::vec3>  m_points;
     glm::vec3   m_centroid;

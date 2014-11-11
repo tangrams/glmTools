@@ -6,9 +6,9 @@
 //
 
 #include "glmPolyline.h"
+
 #include "glmPolarPoint.h"
-#include <OpenGL/gl.h>
-#include <deque>
+#include "glmGeom.h"
 
 glmPolyline::glmPolyline():m_centroid(0.0,0.0,0.0),m_bChange(true){
     m_points.clear();
@@ -50,6 +50,7 @@ glmPolyline::glmPolyline(const glmRectangle &_rect, float _radiants){
 }
 
 glmPolyline::~glmPolyline(){
+    m_points.clear();
 }
 
 int glmPolyline::size() const {
@@ -116,7 +117,7 @@ static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
     float   tol2	= tol * tol;  // tolerance squared
     Segment S		= {v[j], v[k]};  // segment from v[j] to v[k]
     glm::vec3 u;
-	u				= S.P1 - S.P0;   // segment direction vector
+    u				= S.P1 - S.P0;   // segment direction vector
     float  cu		= glm::dot(u,u);     // segment length squared
     
     // test each vertex v[i] for max distance from S
@@ -157,50 +158,7 @@ static void simplifyDP(float tol, glm::vec3* v, int j, int k, int* mk ){
 }
 
 void glmPolyline::simplify(float _tolerance){
-    if(m_points.size() < 2) return;
-    
-	int n = size();
-	
-	if(n == 0) {
-		return;
-	}
-    
-    std::vector<glm::vec3> sV;
-	sV.resize(n);
-    
-    int    i, k, m, pv;            // misc counters
-    float  tol2 = _tolerance * _tolerance;       // tolerance squared
-    std::vector<glm::vec3> vt;
-    std::vector<int> mk;
-    vt.resize(n);
-	mk.resize(n,0);
-    
-    
-    // STAGE 1.  Vertex Reduction within tolerance of prior vertex cluster
-    vt[0] = m_points[0];              // start at the beginning
-    for (i=k=1, pv=0; i<n; i++) {
-        if (d2(m_points[i], m_points[pv]) < tol2) continue;
-        
-        vt[k++] = m_points[i];
-        pv = i;
-    }
-    if (pv < n-1) vt[k++] = m_points[n-1];      // finish at the end
-    
-    // STAGE 2.  Douglas-Peucker polyline simplification
-    mk[0] = mk[k-1] = 1;       // mark the first and last vertices
-    simplifyDP( _tolerance, &vt[0], 0, k-1, &mk[0] );
-    
-    // copy marked vertices to the output simplified polyline
-    for (i=m=0; i<k; i++) {
-        if (mk[i]) sV[m++] = vt[i];
-    }
-    
-	//get rid of the unused m_points
-	if( m < (int)sV.size() ){
-		m_points.assign( sV.begin(),sV.begin()+m );
-	}else{
-		m_points = sV;
-	}
+    ::simplify(m_points,_tolerance);
 }
 
 const std::vector<glm::vec3> & glmPolyline::getVertices() const{
@@ -218,14 +176,6 @@ glm::vec3 glmPolyline::getPositionAt(const float &_dist) const{
 	}
 }
 
-void glmPolyline::draw(){
-    glBegin(GL_LINE_STRIP);
-    for (int i = 0; i < size(); i++) {
-        glVertex2d(m_points[i].x,m_points[i].y);
-    }
-    glEnd();
-}
-
 glmRectangle glmPolyline::getBoundingBox() const {
 	glmRectangle box;
     box.growToInclude(m_points);
@@ -234,13 +184,14 @@ glmRectangle glmPolyline::getBoundingBox() const {
 
 glm::vec3 glmPolyline::getCentroid() {
     if(m_bChange){
-        m_centroid = glm::vec3(0.0,0.0,0.0);
-        for (int i = 0; i < m_points.size(); i++) {
-            m_centroid += m_points[i] / (float)m_points.size();
-        }
+        m_centroid = ::getCentroid(m_points);
         m_bChange = false;
     }
     return m_centroid;
+}
+
+float glmPolyline::getArea(){
+    return ::getArea(m_points);
 }
 
 std::vector<glmPolyline> glmPolyline::splitAt(float _dist){
@@ -332,54 +283,6 @@ bool glmPolyline::isInside(float _x, float _y){
 //
 glmPolyline glmPolyline::get2DConvexHull(){
     glmPolyline rta;
-    
-    int n = size();
-    
-    if(n > 3){
-        // initialize a deque D[] from bottom to top so that the
-        // 1st three vertices of P[] are a ccw triangle
-        glm::vec3* D = new glm::vec3[2*n+1];
-        int bot = n-2, top = bot+3;    // initial bottom and top deque indices
-        D[bot] = D[top] = m_points[2];        // 3rd vertex is at both bot and top
-        if (isLeft(m_points[0], m_points[1], m_points[2]) > 0) {
-            D[bot+1] = m_points[0];
-            D[bot+2] = m_points[1];           // ccw vertices are: 2,0,1,2
-        } else {
-            D[bot+1] = m_points[1];
-            D[bot+2] = m_points[0];           // ccw vertices are: 2,1,0,2
-        }
-        
-        // compute the hull on the deque D[]
-        for (int i=3; i < n; i++) {   // process the rest of vertices
-            // test if next vertex is inside the deque hull
-            if ((isLeft(D[bot], D[bot+1], m_points[i]) > 0) &&
-                (isLeft(D[top-1], D[top], m_points[i]) > 0) )
-                continue;         // skip an interior vertex
-            
-            // incrementally add an exterior vertex to the deque hull
-            // get the rightmost tangent at the deque bot
-            while (isLeft(D[bot], D[bot+1], m_points[i]) <= 0)
-                ++bot;                 // remove bot of deque
-            D[--bot] = m_points[i];           // insert P[i] at bot of deque
-            
-            // get the leftmost tangent at the deque top
-            while (isLeft(D[top-1], D[top], m_points[i]) <= 0)
-                --top;                 // pop top of deque
-            D[++top] = m_points[i];           // push P[i] onto top of deque
-        }
-        
-        // transcribe deque D[] to the output hull array H[]
-        int h;        // hull vertex counter
-        for (h=0; h <= (top-bot); h++){
-            rta.add( D[bot + h]);
-        }
-        delete D;
-    }
-    
+    rta.add(getConvexHull(m_points));
     return rta;
 }
-
-//  Other convex hull Reference
-//
-// http://www.geeksforgeeks.org/convex-hull-set-1-jarviss-algorithm-or-wrapping/
-// http://www.geeksforgeeks.org/convex-hull-set-2-graham-scan/
